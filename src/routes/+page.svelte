@@ -35,6 +35,7 @@
 	</div>
 	<div class="content">
 		<p>Check out our community calendar where we post tech events.</p>
+		<br />
 		<div class="">
 			<a class="btn-primary mx-auto" href="/calendar">Community Calendar</a>
 		</div>
@@ -45,7 +46,8 @@
 	<div>
 		<div class="content">
 			<p>Check out our blog where we post links to previous talks, events and presentations.</p>
-			<a class="btn-primary" href="">Check out previous events</a>
+			<br />
+			<a class="btn-primary" href="https://dev.to/techtalkaugusta">Check out previous events</a>
 		</div>
 	</div>
 	<div>
@@ -59,7 +61,10 @@
 	</div>
 	<div class="content">
 		<div>
-			<p>Check out our directory of tech professionals, projects, and local companies.</p>
+			<p>
+				(Under Construction) <br /><br />Check out our directory of tech professionals, projects,
+				and local companies.
+			</p>
 			<button class="btn-primary">Check out our Tech Directory</button>
 		</div>
 	</div>
