@@ -1,6 +1,8 @@
 <script lang="ts">
-	import Counter from './Counter.svelte';
 	import transparentLogo from '$lib/images/logo-transparent.png';
+	import stockCommunity from '$lib/images/stock-community.jpg';
+	import stockBlog from '$lib/images/stock-blog.jpg';
+	import stockFriends from '$lib/images/stock-friends.jpg';
 </script>
 
 <svelte:head>
@@ -8,7 +10,7 @@
 	<meta name="description" content="Tech Talk Augusta, " />
 </svelte:head>
 
-<section>
+<section class="mb-10">
 	<h1>
 		<span class="welcome place-content-center">
 			<picture>
@@ -27,20 +29,44 @@
 	</h3>
 </section>
 
-<section>
-	<button class="primary">Check out the Community Calendar</button>
+<section class="feature bg-amber-50">
+	<div>
+		<img src={stockCommunity} alt="generic group of folks sharing a meal" />
+	</div>
+	<div class="content">
+		<p>Check out our community calendar where we post tech events.</p>
+		<div class="">
+			<a class="btn-primary mx-auto" href="/calendar">Community Calendar</a>
+		</div>
+	</div>
 </section>
 
-<section>
-	<button class="primary">Check out previous events</button>
+<section class="feature bg-lime-50">
+	<div>
+		<div class="content">
+			<p>Check out our blog where we post links to previous talks, events and presentations.</p>
+			<a class="btn-primary" href="">Check out previous events</a>
+		</div>
+	</div>
+	<div>
+		<img src={stockBlog} alt="generic person and computer" />
+	</div>
 </section>
 
-<section>
-	<button class="primary">Check out our Tech Directory</button>
+<section class="feature bg-rose-50">
+	<div>
+		<img src={stockFriends} alt="generic friends" />
+	</div>
+	<div class="content">
+		<div>
+			<p>Check out our directory of tech professionals, projects, and local companies.</p>
+			<button class="btn-primary">Check out our Tech Directory</button>
+		</div>
+	</div>
 </section>
 
-<section>
-	<h3 class="text-xl mb-3">Why Augusta?</h3>
+<section class="mt-5">
+	<h3 class="mb-3 text-xl">Why Augusta?</h3>
 	<p>
 		Augusta is a city with a rich history and a bright future, uniquely positioned to become a hub
 		for technological growth and innovation.
@@ -73,7 +99,9 @@
 	</ul>
 	<p>
 		<br /><br />
-		Augusta has the talent, the drive, and the resources to stand on its own two feet as a tech leader—not just for government contractors but for everyone who calls this city home. Together, we can build a community where technology uplifts every corner of Augusta. Join us in making it happen.
+		Augusta has the talent, the drive, and the resources to stand on its own two feet as a tech leader—not
+		just for government contractors but for everyone who calls this city home. Together, we can build
+		a community where technology uplifts every corner of Augusta. Join us in making it happen.
 	</p>
 </section>
 
@@ -88,6 +116,29 @@
 
 	h1 {
 		width: 100%;
+	}
+
+	.feature {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+	.feature > * {
+		flex: 50%;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.feature .content {
+		padding: 20px;
+	}
+	.feature .content p {
+		padding: 10px;
+	}
+
+	.feature img {
+		max-width: 100%;
+		min-width: 200px;
 	}
 
 	.welcome {
