@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Header from './Header.svelte';
 	import '../app.css';
-	
+
 	let { children } = $props();
 </script>
 
@@ -13,9 +13,7 @@
 	</main>
 
 	<footer>
-		<p>
-			visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to learn about SvelteKit
-		</p>
+		<p>Tech Talk Augusta is run by Soft Ground LLC</p>
 	</footer>
 </div>
 

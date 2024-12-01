@@ -74,7 +74,7 @@
 		As the home of the Army Cyber Center of Excellence, the Augusta National, Georgia Cyber Center, and
 		the Savannah River Nuclear Site, our city is no stranger to world-class projects and cutting-edge
 		expertise. Yet, while these institutions bring incredible resources and talent, there’s a missing
-		piece: support for small businesses, local software developers, and the vibrant downtown community.
+		piece, support for: small businesses, local software developers, and the vibrant downtown community.
 		<br /><br />
 		At Tech Talk Augusta, we believe in the power of technology to shape a better future for everyone
 		in our city. We see a need for:
