@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Header from './Header.svelte';
+	import Footer from './Footer.svelte';
+
 	import '../app.css';
 
 	let { children } = $props();
@@ -12,9 +14,7 @@
 		{@render children()}
 	</main>
 
-	<footer>
-		<p>Tech Talk Augusta is run by Soft Ground LLC</p>
-	</footer>
+	<Footer />
 </div>
 
 <style>
@@ -33,23 +33,5 @@
 		max-width: 64rem;
 		margin: 0 auto;
 		box-sizing: border-box;
-	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 12px;
-	}
-
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
 	}
 </style>
