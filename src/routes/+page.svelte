@@ -70,6 +70,18 @@
 	</div>
 </section>
 
+<section class="my-5">
+	<h3 class="mb-3 text-xl">Call For Speakers</h3>
+	<p class="mb-3">
+		Volunteering to speak at tech meetups is crucial because it fosters knowledge sharing and
+		community growth. Without speakers, there’s no content, no learning, and no opportunity for
+		networking or collaboration. By sharing your expertise, you inspire others, spark innovation,
+		and help build a stronger, more connected tech community. Plus, it’s a chance to give back and
+		elevate the industry as a whole!
+	</p>
+	<button class="btn-primary">Apply to be a Speaker!</button>
+</section>
+
 <section class="mt-5">
 	<h3 class="mb-3 text-xl">Why Augusta?</h3>
 	<p>
