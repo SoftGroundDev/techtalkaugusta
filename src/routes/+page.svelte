@@ -79,7 +79,16 @@
 		and help build a stronger, more connected tech community. Plus, it’s a chance to give back and
 		elevate the industry as a whole!
 	</p>
-	<button class="btn-primary">Apply to be a Speaker!</button>
+	<a href="/forms/call-for-speakers">Apply to be a Speaker!</a>
+</section>
+
+<section>
+	<h3 class="mb-3 text-xl">Contact Us</h3>
+	<p class="mb-3">
+		We'd love to hear from you! Whether you have questions, suggestions, or just want to say hello,
+		feel free to reach out.
+	</p>
+	<a class="btn-primary" href="/forms/contact">Contact Us</a>
 </section>
 
 <section class="mt-5">
