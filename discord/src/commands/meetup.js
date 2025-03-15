@@ -1,4 +1,39 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+
+// Helper function to check admin permissions
+function hasAdminPermission(member) {
+    // Check for Discord administrator permission
+    if (member.permissions.has(PermissionFlagsBits.Administrator)) {
+        return true;
+    }
+    
+    // Check for specific roles
+    return member.roles.cache.some(role => 
+        ['Admin', 'Moderator', 'Event Organizer'].includes(role.name)
+    );
+}
+
+// Helper function to log admin actions
+async function logAdminAction(message, action, details) {
+    const logChannel = message.guild.channels.cache.find(
+        channel => channel.name === 'admin-logs'
+    );
+
+    if (logChannel) {
+        const logEmbed = new EmbedBuilder()
+            .setTitle('Admin Action Log')
+            .setColor('#0099ff')
+            .setDescription(`
+                👤 **Admin:** ${message.author.tag}
+                📋 **Action:** ${action}
+                ⏰ **Time:** ${new Date().toLocaleString()}
+                ${details ? `\n📝 **Details:**\n${details}` : ''}
+            `)
+            .setFooter({ text: `Admin ID: ${message.author.id}` });
+
+        await logChannel.send({ embeds: [logEmbed] });
+    }
+}
 
 const commands = {
     async schedule(message) {
@@ -8,10 +43,18 @@ const commands = {
     },
 
     async create(message, args) {
-        // Check if user has permission to create meetups
-        if (!message.member.roles.cache.some(role => 
-            ['Admin', 'Moderator', 'Event Organizer'].includes(role.name))) {
-            return message.reply('You do not have permission to create meetups.');
+        // Enhanced permission check
+        if (!hasAdminPermission(message.member)) {
+            const embed = new EmbedBuilder()
+                .setTitle('Permission Denied')
+                .setColor('#ff0000')
+                .setDescription(
+                    '❌ You do not have permission to create meetups.\n\n' +
+                    'Required permissions:\n' +
+                    '• Discord Administrator, OR\n' +
+                    '• One of these roles: Admin, Moderator, Event Organizer'
+                );
+            return message.reply({ embeds: [embed] });
         }
 
         // Example: !meetup create "Title" "2024-04-15" "18:00" "Location" "Topic" "Speaker"
@@ -19,10 +62,16 @@ const commands = {
             ?.map(arg => arg.replace(/"/g, '')) || [];
 
         if (!title || !date || !time || !location || !topic) {
-            return message.reply(
-                'Please provide all required information:\n' +
-                '`!meetup create "Title" "YYYY-MM-DD" "HH:MM" "Location" "Topic" "Speaker"`'
-            );
+            const embed = new EmbedBuilder()
+                .setTitle('Invalid Command Format')
+                .setColor('#ff9900')
+                .setDescription(
+                    'Please provide all required information:\n' +
+                    '```\n!meetup create "Title" "YYYY-MM-DD" "HH:MM" "Location" "Topic" "Speaker"\n```\n' +
+                    '**Example:**\n' +
+                    '```\n!meetup create "Tech Talk #42" "2024-04-15" "18:00" "Innovation Center" "AI Development" "John Doe"\n```'
+                );
+            return message.reply({ embeds: [embed] });
         }
 
         try {
@@ -37,21 +86,30 @@ const commands = {
             });
 
             const embed = new EmbedBuilder()
-                .setTitle('New Meetup Created!')
+                .setTitle('New Meetup Created! 🎉')
                 .setColor('#00ff00')
                 .setDescription(`
                     Successfully created meetup: ${meetup.title}
-                    ID: ${meetup.id}
-                    Date: ${meetup.date.toLocaleDateString()}
-                    Time: ${meetup.time}
-                    Location: ${meetup.location}
-                    Topic: ${meetup.topic}
-                    Speaker: ${meetup.speaker}
+                    
+                    📋 Details:
+                    • ID: ${meetup.id}
+                    • Date: ${meetup.date.toLocaleDateString()}
+                    • Time: ${meetup.time}
+                    • Location: ${meetup.location}
+                    • Topic: ${meetup.topic}
+                    • Speaker: ${meetup.speaker}
+
+                    Members can RSVP using:
+                    \`!meetup rsvp ${meetup.id} [yes/no/maybe]\`
                 `.trim());
 
             await message.reply({ embeds: [embed] });
         } catch (error) {
-            await message.reply('Failed to create meetup. Please check the date format and try again.');
+            const embed = new EmbedBuilder()
+                .setTitle('Error Creating Meetup')
+                .setColor('#ff0000')
+                .setDescription('Failed to create meetup. Please check the date format and try again.');
+            await message.reply({ embeds: [embed] });
         }
     },
 
@@ -59,11 +117,30 @@ const commands = {
         const [meetupId, status = 'yes'] = args;
         
         if (!meetupId) {
-            return message.reply('Please provide a meetup ID: `!rsvp <meetup_id> [yes/no/maybe]`');
+            const embed = new EmbedBuilder()
+                .setTitle('Invalid Command Format')
+                .setColor('#ff9900')
+                .setDescription(
+                    'Please provide a meetup ID and status:\n' +
+                    '```\n!meetup rsvp <meetup_id> [yes/no/maybe]\n```\n' +
+                    '**Example:**\n' +
+                    '```\n!meetup rsvp 123456789 yes\n```'
+                );
+            return message.reply({ embeds: [embed] });
         }
 
         if (!['yes', 'no', 'maybe'].includes(status.toLowerCase())) {
-            return message.reply('Invalid RSVP status. Use: yes, no, or maybe');
+            const embed = new EmbedBuilder()
+                .setTitle('Invalid RSVP Status')
+                .setColor('#ff9900')
+                .setDescription(
+                    '❌ Invalid RSVP status.\n\n' +
+                    'Please use one of these options:\n' +
+                    '• `yes` - Confirm attendance\n' +
+                    '• `no` - Cannot attend\n' +
+                    '• `maybe` - Might attend'
+                );
+            return message.reply({ embeds: [embed] });
         }
 
         const success = await message.client.meetupManager.handleRSVP(
@@ -73,28 +150,68 @@ const commands = {
         );
 
         if (success) {
-            await message.reply(`You have successfully RSVP'd "${status}" to the meetup!`);
+            const embed = new EmbedBuilder()
+                .setTitle('RSVP Updated ✅')
+                .setColor('#00ff00')
+                .setDescription(`
+                    You have successfully RSVP'd "${status}" to the meetup!
+                    
+                    You can change your RSVP at any time using:
+                    \`!meetup rsvp ${meetupId} [yes/no/maybe]\`
+                `);
+            await message.reply({ embeds: [embed] });
         } else {
-            await message.reply('Meetup not found. Please check the ID and try again.');
+            const embed = new EmbedBuilder()
+                .setTitle('RSVP Failed')
+                .setColor('#ff0000')
+                .setDescription('❌ Meetup not found. Please check the ID and try again.');
+            await message.reply({ embeds: [embed] });
         }
     },
 
     async cancel(message, args) {
-        // Check if user has permission to cancel meetups
-        if (!message.member.roles.cache.some(role => 
-            ['Admin', 'Moderator', 'Event Organizer'].includes(role.name))) {
-            return message.reply('You do not have permission to cancel meetups.');
+        // Enhanced permission check
+        if (!hasAdminPermission(message.member)) {
+            const embed = new EmbedBuilder()
+                .setTitle('Permission Denied')
+                .setColor('#ff0000')
+                .setDescription(
+                    '❌ You do not have permission to cancel meetups.\n\n' +
+                    'Required permissions:\n' +
+                    '• Discord Administrator, OR\n' +
+                    '• One of these roles: Admin, Moderator, Event Organizer'
+                );
+            return message.reply({ embeds: [embed] });
         }
 
         const [meetupId] = args;
         if (!meetupId) {
-            return message.reply('Please provide a meetup ID: `!meetup cancel <meetup_id>`');
+            const embed = new EmbedBuilder()
+                .setTitle('Invalid Command Format')
+                .setColor('#ff9900')
+                .setDescription(
+                    'Please provide a meetup ID:\n' +
+                    '```\n!meetup cancel <meetup_id>\n```'
+                );
+            return message.reply({ embeds: [embed] });
         }
 
         const meetup = message.client.meetupManager.meetups.get(meetupId);
         if (!meetup) {
-            return message.reply('Meetup not found.');
+            const embed = new EmbedBuilder()
+                .setTitle('Meetup Not Found')
+                .setColor('#ff0000')
+                .setDescription('❌ Could not find a meetup with that ID.');
+            return message.reply({ embeds: [embed] });
         }
+
+        // Log the cancellation before executing it
+        await logAdminAction(message, 'Meetup Cancelled', `
+            • Meetup ID: ${meetupId}
+            • Title: ${meetup.title}
+            • Date: ${meetup.date.toLocaleDateString()}
+            • Attendees: ${meetup.attendees.size}
+        `);
 
         message.client.meetupManager.meetups.delete(meetupId);
         await message.client.meetupManager.updateScheduleMessage();
@@ -104,16 +221,19 @@ const commands = {
         if (attendeesList.length > 0) {
             const channel = await message.client.meetupManager.getScheduleChannel();
             const cancelEmbed = new EmbedBuilder()
-                .setTitle('Meetup Cancelled')
+                .setTitle('⚠️ Meetup Cancelled')
                 .setColor('#ff0000')
                 .setDescription(`
                     The following meetup has been cancelled:
                     
-                    ${meetup.title}
-                    Date: ${meetup.date.toLocaleDateString()}
-                    Time: ${meetup.time}
+                    📋 **${meetup.title}**
+                    • Date: ${meetup.date.toLocaleDateString()}
+                    • Time: ${meetup.time}
+                    • Location: ${meetup.location}
                     
                     We apologize for any inconvenience.
+                    
+                    A new meetup will be scheduled soon!
                 `.trim());
             
             await channel.send({ 
@@ -122,7 +242,17 @@ const commands = {
             });
         }
 
-        await message.reply('Meetup has been cancelled successfully.');
+        const confirmEmbed = new EmbedBuilder()
+            .setTitle('Meetup Cancelled Successfully')
+            .setColor('#00ff00')
+            .setDescription(`
+                ✅ The meetup "${meetup.title}" has been cancelled.
+                
+                • ${meetup.attendees.size} attendees have been notified
+                • The meetup schedule has been updated
+                • The cancellation has been logged
+            `);
+        await message.reply({ embeds: [confirmEmbed] });
     }
 };
 
@@ -133,13 +263,25 @@ module.exports = {
         const subcommand = args.shift();
         
         if (!subcommand || !commands[subcommand]) {
-            return message.reply(
-                'Available commands:\n' +
-                '`!meetup schedule` - View upcoming meetups\n' +
-                '`!meetup create "Title" "YYYY-MM-DD" "HH:MM" "Location" "Topic" "Speaker"` - Create a new meetup\n' +
-                '`!meetup rsvp <meetup_id> [yes/no/maybe]` - RSVP to a meetup\n' +
-                '`!meetup cancel <meetup_id>` - Cancel a meetup'
-            );
+            const embed = new EmbedBuilder()
+                .setTitle('Meetup Commands')
+                .setColor('#0099ff')
+                .setDescription(`
+                    Available commands:
+                    
+                    📅 **View Schedule**
+                    \`!meetup schedule\` - View upcoming meetups
+                    
+                    ✨ **Create Meetup** (Admin only)
+                    \`!meetup create "Title" "YYYY-MM-DD" "HH:MM" "Location" "Topic" "Speaker"\`
+                    
+                    👥 **RSVP to Meetup**
+                    \`!meetup rsvp <meetup_id> [yes/no/maybe]\`
+                    
+                    ❌ **Cancel Meetup** (Admin only)
+                    \`!meetup cancel <meetup_id>\`
+                `.trim());
+            return message.reply({ embeds: [embed] });
         }
 
         await commands[subcommand](message, args);

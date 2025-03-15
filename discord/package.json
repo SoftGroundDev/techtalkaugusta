@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "deploy:azure": "az webapp up --name tech-talk-augusta-bot --resource-group tech-talk-augusta --runtime \"NODE:18-lts\" --sku F1"
   },
   "dependencies": {
     "discord.js": "^14.14.1",
@@ -15,5 +16,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 } 

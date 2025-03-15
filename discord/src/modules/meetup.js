@@ -1,11 +1,36 @@
 const { EmbedBuilder } = require('discord.js');
 const cron = require('node-cron');
+const db = require('./database');
+const eventbrite = require('./eventbrite');
 
 class MeetupManager {
     constructor(client) {
         this.client = client;
         this.meetups = new Map();
         this.setupCronJobs();
+        this.loadMeetupsFromDB();
+    }
+
+    async loadMeetupsFromDB() {
+        try {
+            const Meetup = db.getModel('Meetup');
+            const meetups = await Meetup.find({
+                date: { $gte: new Date() }
+            });
+
+            meetups.forEach(meetup => {
+                this.meetups.set(meetup.id, {
+                    ...meetup.toObject(),
+                    attendees: new Set(meetup.attendees),
+                    maybes: new Set(meetup.maybes),
+                    declined: new Set(meetup.declined)
+                });
+            });
+
+            console.log(`Loaded ${meetups.length} meetups from database`);
+        } catch (error) {
+            console.error('Failed to load meetups from database:', error);
+        }
     }
 
     setupCronJobs() {
@@ -30,12 +55,35 @@ class MeetupManager {
             maybes: new Set(),
             declined: new Set(),
             created: new Date(),
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
+            eventbriteId: null,
+            eventbriteUrl: null,
+            eventbriteSynced: false
         };
 
-        this.meetups.set(meetup.id, meetup);
-        await this.updateScheduleMessage();
-        return meetup;
+        try {
+            // Create Eventbrite event first
+            const eventbriteData = await eventbrite.syncWithDiscord(meetup);
+            meetup.eventbriteId = eventbriteData.eventbriteId;
+            meetup.eventbriteUrl = eventbriteData.eventbriteUrl;
+            meetup.eventbriteSynced = true;
+
+            // Save to database
+            const Meetup = db.getModel('Meetup');
+            await new Meetup({
+                ...meetup,
+                attendees: Array.from(meetup.attendees),
+                maybes: Array.from(meetup.maybes),
+                declined: Array.from(meetup.declined)
+            }).save();
+
+            this.meetups.set(meetup.id, meetup);
+            await this.updateScheduleMessage();
+            return meetup;
+        } catch (error) {
+            console.error('Failed to create meetup:', error);
+            throw error;
+        }
     }
 
     async updateScheduleMessage() {
@@ -80,6 +128,7 @@ class MeetupManager {
                         ⏰ Time: ${meetup.time}
                         👥 Attendees: ${meetup.attendees.size}
                         
+                        ${meetup.eventbriteUrl ? `🎟️ [Register on Eventbrite](${meetup.eventbriteUrl})` : ''}
                         Use \`!rsvp ${meetup.id}\` to attend!
                     `.trim()
                 });
@@ -146,14 +195,54 @@ class MeetupManager {
                 break;
         }
 
-        await this.updateScheduleMessage();
-        return true;
+        try {
+            const Meetup = db.getModel('Meetup');
+            await Meetup.findOneAndUpdate(
+                { id: meetupId },
+                {
+                    attendees: Array.from(meetup.attendees),
+                    maybes: Array.from(meetup.maybes),
+                    declined: Array.from(meetup.declined),
+                    lastUpdated: new Date()
+                }
+            );
+
+            await this.updateScheduleMessage();
+            return true;
+        } catch (error) {
+            console.error('Failed to update RSVP in database:', error);
+            return false;
+        }
     }
 
     async getScheduleChannel() {
         return this.client.channels.cache.find(
             channel => channel.name === 'meetup-schedule'
         );
+    }
+
+    async cancel(meetupId) {
+        const meetup = this.meetups.get(meetupId);
+        if (!meetup) return false;
+
+        try {
+            // Cancel Eventbrite event if it exists
+            if (meetup.eventbriteId) {
+                await eventbrite.cancelEvent(meetup.eventbriteId);
+            }
+
+            // Delete from database
+            const Meetup = db.getModel('Meetup');
+            await Meetup.deleteOne({ id: meetupId });
+
+            // Remove from local cache
+            this.meetups.delete(meetupId);
+            await this.updateScheduleMessage();
+            return true;
+        } catch (error) {
+            console.error('Failed to cancel meetup:', error);
+            throw error;
+        }
     }
 }
 

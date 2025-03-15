@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const MeetupManager = require('./modules/meetup');
+const db = require('./modules/database');
 const fs = require('fs');
 const path = require('path');
 
@@ -80,20 +81,87 @@ client.on('messageCreate', async (message) => {
 });
 
 // Bot ready event
-client.once('ready', () => {
+client.once('ready', async () => {
+  console.log(`Bot is starting up...`);
   console.log(`Logged in as ${client.user.tag}`);
+  console.log(`Bot ID: ${client.user.id}`);
+  console.log(`Connected to ${client.guilds.cache.size} servers`);
+  
+  // Connect to database
+  try {
+    await db.connect();
+    console.log('Database connection established');
+  } catch (error) {
+    console.error('Failed to connect to database:', error);
+  }
+
   // Initialize meetup schedule
-  client.meetupManager.updateScheduleMessage().catch(console.error);
+  try {
+    await client.meetupManager.updateScheduleMessage();
+    console.log('Meetup schedule initialized');
+  } catch (error) {
+    console.error('Failed to initialize meetup schedule:', error);
+  }
+
+  console.log('Bot is now fully ready!');
 });
 
-// Error handling
+// Add reconnection handling
+client.on('disconnect', (event) => {
+  console.log(`Bot disconnected from Discord gateway with code ${event.code}`);
+});
+
+client.on('reconnecting', () => {
+  console.log('Bot is attempting to reconnect to Discord gateway...');
+});
+
+client.on('resume', (replayed) => {
+  console.log(`Bot reconnected to Discord gateway! Replayed ${replayed} events.`);
+});
+
+// Enhanced error handling
 client.on('error', error => {
   console.error('Discord client error:', error);
+  console.error('Error stack trace:', error.stack);
 });
 
-process.on('unhandledRejection', error => {
+client.on('warn', info => {
+  console.warn('Discord client warning:', info);
+});
+
+client.on('debug', info => {
+  if (process.env.NODE_ENV === 'development') {
+    console.debug('Discord debug:', info);
+  }
+});
+
+process.on('unhandledRejection', (error, promise) => {
   console.error('Unhandled promise rejection:', error);
+  console.error('Promise:', promise);
+  console.error('Stack trace:', error.stack);
 });
 
-// Login to Discord
-client.login(process.env.DISCORD_TOKEN); 
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('Received SIGINT signal...');
+  console.log('Cleaning up connections...');
+  try {
+    await db.disconnect();
+    console.log('Database disconnected');
+    await client.destroy();
+    console.log('Discord client destroyed');
+    console.log('Shutdown complete');
+    process.exit(0);
+  } catch (error) {
+    console.error('Error during shutdown:', error);
+    process.exit(1);
+  }
+});
+
+// Login to Discord with enhanced error handling
+console.log('Attempting to connect to Discord...');
+client.login(process.env.DISCORD_TOKEN).catch(error => {
+  console.error('Failed to login to Discord:', error);
+  console.error('Token used:', process.env.DISCORD_TOKEN ? '[Token present]' : '[No token found]');
+  process.exit(1);
+}); 
