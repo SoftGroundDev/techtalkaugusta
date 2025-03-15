@@ -8,7 +8,19 @@ class MeetupManager {
         this.client = client;
         this.meetups = new Map();
         this.setupCronJobs();
-        this.loadMeetupsFromDB();
+        this.initialize();
+    }
+
+    async initialize() {
+        try {
+            // Ensure database is connected
+            if (!db.isConnected) {
+                await db.connect();
+            }
+            await this.loadMeetupsFromDB();
+        } catch (error) {
+            console.error('Failed to initialize MeetupManager:', error);
+        }
     }
 
     async isDbConnected() {
@@ -51,6 +63,11 @@ class MeetupManager {
     }
 
     async createMeetup(data) {
+        // Ensure database is connected
+        if (!db.isConnected) {
+            await db.connect();
+        }
+
         const meetup = {
             id: Date.now().toString(),
             title: data.title,
@@ -96,12 +113,20 @@ class MeetupManager {
 
             // Save to database
             const Meetup = db.getModel('Meetup');
-            await new Meetup({
+            if (!Meetup) {
+                throw new Error('Failed to get Meetup model from database');
+            }
+
+            const savedMeetup = await new Meetup({
                 ...meetup,
                 attendees: Array.from(meetup.attendees),
                 maybes: Array.from(meetup.maybes),
                 declined: Array.from(meetup.declined)
             }).save();
+
+            if (!savedMeetup) {
+                throw new Error('Failed to save meetup to database');
+            }
 
             this.meetups.set(meetup.id, meetup);
             await this.updateScheduleMessage();

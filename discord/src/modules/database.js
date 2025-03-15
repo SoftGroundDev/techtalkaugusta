@@ -134,13 +134,24 @@ class DatabaseManager {
         });
 
         // Create models if they don't exist
-        mongoose.models.Meetup || mongoose.model('Meetup', meetupSchema);
-        mongoose.models.Resource || mongoose.model('Resource', resourceSchema);
-        mongoose.models.User || mongoose.model('User', userSchema);
+        try {
+            this.models = {
+                Meetup: mongoose.models.Meetup || mongoose.model('Meetup', meetupSchema),
+                Resource: mongoose.models.Resource || mongoose.model('Resource', resourceSchema),
+                User: mongoose.models.User || mongoose.model('User', userSchema)
+            };
+            console.log('Models initialized successfully');
+        } catch (error) {
+            console.error('Error initializing models:', error);
+            throw error;
+        }
     }
 
     getModel(modelName) {
-        return mongoose.models[modelName];
+        if (!this.models || !this.models[modelName]) {
+            throw new Error(`Model ${modelName} not initialized. Please ensure database is connected.`);
+        }
+        return this.models[modelName];
     }
 
     async disconnect() {
