@@ -1,136 +1,64 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
-const MeetupManager = require('./modules/meetup');
-const db = require('./modules/database');
-const uptimeRobot = require('./modules/uptimerobot');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
-const compression = require('compression');
 const app = express();
 
 // Port configuration for Azure compatibility
 const PORT = process.env.PORT || process.env.WEBSITES_PORT || 8080;
 const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 
-// Enable compression
-app.use(compression());
-
-// Express health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'healthy',
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString(),
-    port: PORT,
-    node_version: process.version
-  });
+// Simple health check endpoint
+app.get('/health', async (req, res) => {
+  try {
+    const dbStatus = client.meetupManager ? await client.meetupManager.isDbConnected() : false;
+    
+    res.status(200).json({
+      status: 'healthy',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+      database: {
+        connected: dbStatus,
+        status: dbStatus ? 'connected' : 'disconnected'
+      },
+      discord: {
+        connected: client.ws.status === 0,
+        ping: client.ws.ping
+      },
+      memory: {
+        heapUsed: process.memoryUsage().heapUsed,
+        heapTotal: process.memoryUsage().heapTotal
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'unhealthy',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 app.get('/', (req, res) => {
   res.send('Tech Talk Augusta Bot is running!');
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('Express error:', err);
-  res.status(500).json({
-    status: 'error',
-    message: 'Internal server error',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Start Express server with error handling
+// Start Express server
 const server = app.listen(PORT, HOST, () => {
-  console.log(`Health check server listening on ${HOST}:${PORT}`);
-  console.log(`Node.js version: ${process.version}`);
-  console.log(`Environment: ${process.env.NODE_ENV}`);
-}).on('error', (error) => {
-  console.error('Express server error:', error);
-  // Exit if we can't bind to the port
-  if (error.code === 'EACCES' || error.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is not available. Exiting...`);
-    process.exit(1);
-  }
+  console.log(`Server listening on ${HOST}:${PORT}`);
 });
 
 // Graceful shutdown handler
 const gracefulShutdown = async () => {
   console.log('Initiating graceful shutdown...');
-  
-  // Close Express server
-  server.close(() => {
-    console.log('Express server closed');
-  });
-
-  // Close database connection
-  try {
-    await db.disconnect();
-    console.log('Database disconnected');
-  } catch (error) {
-    console.error('Error disconnecting from database:', error);
-  }
-
-  // Destroy Discord client
-  try {
-    await client.destroy();
-    console.log('Discord client destroyed');
-  } catch (error) {
-    console.error('Error destroying Discord client:', error);
-  }
-
-  // Exit process
+  server.close(() => console.log('Express server closed'));
+  if (client) await client.destroy();
   process.exit(0);
 };
 
-// Handle shutdown signals
 process.on('SIGTERM', gracefulShutdown);
 process.on('SIGINT', gracefulShutdown);
-
-// Memory usage monitoring
-const logMemoryUsage = () => {
-  const used = process.memoryUsage();
-  console.log('Memory Usage:');
-  for (let key in used) {
-    console.log(`${key}: ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
-  }
-  
-  // Check if memory usage is too high (over 450MB for free tier)
-  if (used.heapUsed > 450 * 1024 * 1024) {
-    console.warn('Memory usage is high, initiating garbage collection');
-    try {
-      if (global.gc) {
-        global.gc();
-      }
-    } catch (e) {
-      console.warn('Garbage collection not available. Start with --expose-gc flag if needed.');
-    }
-    
-    // Additional memory optimization for Node.js 20
-    if (process.versions.node.startsWith('20')) {
-      try {
-        // Clear module cache for non-essential modules
-        Object.keys(require.cache).forEach(key => {
-          if (!key.includes('node_modules')) {
-            delete require.cache[key];
-          }
-        });
-      } catch (e) {
-        console.warn('Error clearing module cache:', e);
-      }
-    }
-  }
-};
-
-// Optimize intervals based on memory usage
-const MEMORY_CHECK_INTERVAL = process.env.NODE_ENV === 'production' ? 15 * 60 * 1000 : 5 * 60 * 1000;
-const STATUS_UPDATE_INTERVAL = process.env.NODE_ENV === 'production' ? 15 * 60 * 1000 : 5 * 60 * 1000;
-
-// Log memory usage at optimized intervals
-setInterval(logMemoryUsage, MEMORY_CHECK_INTERVAL);
-// Initial memory usage log
-logMemoryUsage();
 
 const client = new Client({
   intents: [
@@ -142,7 +70,6 @@ const client = new Client({
 });
 
 client.commands = new Collection();
-client.meetupManager = new MeetupManager(client);
 
 // Load commands
 const commandFiles = fs.readdirSync(path.join(__dirname, 'commands'))
@@ -183,134 +110,23 @@ client.on('messageCreate', async (message) => {
       try {
         await command.execute(message, args);
       } catch (error) {
-        console.error(error);
+        console.error('Command error:', error);
         await message.reply('There was an error executing that command.');
       }
     }
   }
 });
 
-// Connect to database with retry logic
-const connectWithRetry = async (retries = 5, delay = 5000) => {
-  const dbOptions = {
-    ssl: process.env.NODE_ENV === 'production',
-    sslValidate: false,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 3000,
-    socketTimeoutMS: 30000,
-    connectTimeoutMS: 5000,
-    retryWrites: true,
-    maxPoolSize: 3,
-    minPoolSize: 0
-  };
-
-  for (let i = 0; i < retries; i++) {
-    try {
-      console.log(`MongoDB connection attempt ${i + 1} of ${retries}`);
-      await db.connect(dbOptions);
-      console.log('Database connection established successfully');
-      return true;
-    } catch (error) {
-      console.error('Failed to connect to database:', {
-        attempt: i + 1,
-        name: error.name,
-        message: error.message,
-        code: error.code
-      });
-      
-      if (i < retries - 1) {
-        console.log(`Retrying in ${delay/1000} seconds...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-  }
-  console.log('Failed to connect to MongoDB after all retries. Bot will run without database features.');
-  return false;
-};
-
 // Bot ready event
-client.once('ready', async () => {
-  console.log(`Bot is starting up...`);
+client.once('ready', () => {
   console.log(`Logged in as ${client.user.tag}`);
-  console.log(`Bot ID: ${client.user.id}`);
   console.log(`Connected to ${client.guilds.cache.size} servers`);
-  
-  // Try to connect to database
-  const dbConnected = await connectWithRetry();
-  
-  // Initialize features based on database connection
-  if (dbConnected) {
-    try {
-      await client.meetupManager.updateScheduleMessage();
-      console.log('Meetup schedule initialized');
-    } catch (error) {
-      console.error('Failed to initialize meetup schedule:', error);
-    }
-  } else {
-    console.log('Skipping database-dependent features');
-  }
-
-  // Initialize status monitoring
-  try {
-    await uptimeRobot.updateStatusMessage(client);
-    console.log('Status monitoring initialized');
-
-    // Set up automatic status updates every 15 minutes
-    setInterval(async () => {
-      try {
-        await uptimeRobot.updateStatusMessage(client);
-        console.log('Status monitoring updated');
-      } catch (error) {
-        console.error('Failed to update status monitoring:', error);
-      }
-    }, STATUS_UPDATE_INTERVAL);
-  } catch (error) {
-    console.error('Failed to initialize status monitoring:', error);
-  }
-
-  console.log('Bot is now fully ready!');
 });
 
-// Add reconnection handling
-client.on('disconnect', (event) => {
-  console.log(`Bot disconnected from Discord gateway with code ${event.code}`);
-});
-
-client.on('reconnecting', () => {
-  console.log('Bot is attempting to reconnect to Discord gateway...');
-});
-
-client.on('resume', (replayed) => {
-  console.log(`Bot reconnected to Discord gateway! Replayed ${replayed} events.`);
-});
-
-// Enhanced error handling
+// Basic error handling
 client.on('error', error => {
   console.error('Discord client error:', error);
-  console.error('Error stack trace:', error.stack);
 });
 
-client.on('warn', info => {
-  console.warn('Discord client warning:', info);
-});
-
-client.on('debug', info => {
-  if (process.env.NODE_ENV === 'development') {
-    console.debug('Discord debug:', info);
-  }
-});
-
-process.on('unhandledRejection', (error, promise) => {
-  console.error('Unhandled promise rejection:', error);
-  console.error('Promise:', promise);
-  console.error('Stack trace:', error.stack);
-});
-
-// Login to Discord with enhanced error handling
-console.log('Attempting to connect to Discord...');
-client.login(process.env.DISCORD_TOKEN).catch(error => {
-  console.error('Failed to login to Discord:', error);
-  console.error('Token used:', process.env.DISCORD_TOKEN ? '[Token present]' : '[No token found]');
-  process.exit(1);
-}); 
+// Login to Discord
+client.login(process.env.DISCORD_TOKEN); 

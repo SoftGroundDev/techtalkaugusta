@@ -21,9 +21,17 @@ class DatabaseManager {
             const options = {
                 useNewUrlParser: true,
                 useUnifiedTopology: true,
-                serverSelectionTimeoutMS: 5000,
+                serverSelectionTimeoutMS: 10000, // Increased timeout
                 socketTimeoutMS: 45000,
-                family: 4 // Use IPv4, skip trying IPv6
+                family: 4, // Use IPv4, skip trying IPv6
+                ssl: true,
+                sslValidate: true,
+                retryWrites: true,
+                w: 'majority',
+                maxPoolSize: 10,
+                minPoolSize: 1,
+                maxIdleTimeMS: 30000,
+                connectTimeoutMS: 10000
             };
 
             // Connect with retry logic

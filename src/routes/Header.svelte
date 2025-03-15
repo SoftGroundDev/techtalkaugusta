@@ -1,15 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import logo from '$lib/images/logo-transparent.png';
 	import github from '$lib/images/github.svg';
 </script>
 
 <header>
-	<div class="corner">
-		<a href="/">
-			<img src={logo} alt="Tech Talk Augusta" />
-		</a>
-	</div>
 
 	<nav>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
