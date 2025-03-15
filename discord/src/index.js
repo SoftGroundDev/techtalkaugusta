@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const MeetupManager = require('./modules/meetup');
 const db = require('./modules/database');
+const uptimeRobot = require('./modules/uptimerobot');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
@@ -25,6 +26,20 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Health check server listening on port ${PORT}`);
 });
+
+// Memory usage monitoring
+const logMemoryUsage = () => {
+  const used = process.memoryUsage();
+  console.log('Memory Usage:');
+  for (let key in used) {
+    console.log(`${key}: ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
+  }
+};
+
+// Log memory usage every 5 minutes
+setInterval(logMemoryUsage, 5 * 60 * 1000);
+// Initial memory usage log
+logMemoryUsage();
 
 const client = new Client({
   intents: [
@@ -93,7 +108,16 @@ client.once('ready', async () => {
   
   // Connect to database
   try {
-    await db.connect();
+    const dbOptions = {
+      ssl: true,
+      sslValidate: true,
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      tls: true,
+      tlsInsecure: false,
+      retryWrites: true
+    };
+    await db.connect(dbOptions);
     console.log('Database connection established');
   } catch (error) {
     console.error('Failed to connect to database:', error);
@@ -105,6 +129,24 @@ client.once('ready', async () => {
     console.log('Meetup schedule initialized');
   } catch (error) {
     console.error('Failed to initialize meetup schedule:', error);
+  }
+
+  // Initialize status monitoring
+  try {
+    await uptimeRobot.updateStatusMessage(client);
+    console.log('Status monitoring initialized');
+
+    // Set up automatic status updates every 5 minutes
+    setInterval(async () => {
+      try {
+        await uptimeRobot.updateStatusMessage(client);
+        console.log('Status monitoring updated');
+      } catch (error) {
+        console.error('Failed to update status monitoring:', error);
+      }
+    }, 5 * 60 * 1000); // 5 minutes
+  } catch (error) {
+    console.error('Failed to initialize status monitoring:', error);
   }
 
   console.log('Bot is now fully ready!');
