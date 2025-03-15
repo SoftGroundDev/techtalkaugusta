@@ -2,6 +2,7 @@
 	import instgram from '$lib/images/instagram.svg';
 	import facebook from '$lib/images/facebook.svg';
 	import dev from '$lib/images/dev-to.svg';
+	import discord from '$lib/images/discord-svgrepo-com.svg';
 </script>
 
 <footer>
@@ -23,6 +24,9 @@
 		</li>
 		<li>
 			<a href="https://dev.to/techtalkaugusta"> <img src={dev} alt="dev to blog" /></a>
+		</li>
+		<li>
+			<a href="https://discord.gg/FEjGeawA"> <img src={discord} alt="Discord server invite" /></a>
 		</li>
 	</ul>
 	<p>Tech Talk Augusta is run by Soft Ground LLC</p>

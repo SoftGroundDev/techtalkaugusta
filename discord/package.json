@@ -1,0 +1,19 @@
+{
+  "name": "tech-talk-augusta-bot",
+  "version": "1.0.0",
+  "description": "Discord bot for Tech Talk Augusta meetup group",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.4.5",
+    "node-cron": "^3.0.3",
+    "mongoose": "^8.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+} 
