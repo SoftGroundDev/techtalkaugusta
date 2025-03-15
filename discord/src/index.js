@@ -14,18 +14,55 @@ const app = express();
 const port = process.env.port || 8080;  // Azure App Service expects port 8080 for container health checks
 const HOST = '0.0.0.0';  // Always use 0.0.0.0 in container environments
 
+let isDiscordReady = false;
+let isDatabaseReady = false;
+
+// Express routes - Define before any middleware
+app.get('/health', async (req, res) => {
+  // During startup, always return 200 with startup status
+  res.status(200).json({
+    status: 'starting',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    components: {
+      discord: {
+        status: isDiscordReady ? 'ready' : 'initializing'
+      },
+      database: {
+        status: isDatabaseReady ? 'connected' : 'connecting'
+      }
+    },
+    startup_phase: !isDiscordReady || !isDatabaseReady ? 'in_progress' : 'complete'
+  });
+});
+
+app.get('/', (req, res) => {
+  res.send('Tech Talk Augusta Bot is running!');
+});
+
+// Important: Handle all unmatched routes with 404
+// This must be the last route handler
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Not Found',
+    path: req.path
+  });
+});
+
 // Initialize services
 async function initializeServices() {
   try {
-    // Connect to database first
-    console.log('Connecting to database...');
-    await db.connect();
-    console.log('Database connected successfully');
-
-    // Start Express server
+    // Start Express server first to handle health checks
     const server = app.listen(port, HOST, () => {
       console.log(`Server listening on ${HOST}:${port}`);
     });
+
+    // Connect to database
+    console.log('Connecting to database...');
+    await db.connect();
+    isDatabaseReady = true;
+    console.log('Database connected successfully');
 
     // Initialize Discord client
     const client = new Client({
@@ -56,6 +93,7 @@ async function initializeServices() {
         client.meetupManager = new MeetupManager(client);
         await client.meetupManager.initialize();
         
+        isDiscordReady = true;
         console.log(`Logged in as ${client.user.tag}`);
         console.log(`Connected to ${client.guilds.cache.size} servers`);
       } catch (error) {
@@ -124,54 +162,6 @@ async function initializeServices() {
     process.exit(1);
   }
 }
-
-// Express routes
-app.get('/health', async (req, res) => {
-  try {
-    const dbStatus = db.isConnected;
-    
-    // Always return 200 during startup to prevent Azure from killing the container
-    res.status(200).json({
-      status: 'healthy',
-      uptime: process.uptime(),
-      timestamp: new Date().toISOString(),
-      startup: true,
-      database: {
-        connected: dbStatus,
-        status: dbStatus ? 'connected' : 'disconnected'
-      },
-      discord: {
-        connected: client?.ws?.status === 0 || !client,  // Consider not connected client as OK during startup
-        ping: client?.ws?.ping
-      },
-      memory: {
-        heapUsed: process.memoryUsage().heapUsed,
-        heapTotal: process.memoryUsage().heapTotal
-      }
-    });
-  } catch (error) {
-    // Still return 200 to prevent Azure from killing the container during startup
-    res.status(200).json({
-      status: 'starting',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
-app.get('/', (req, res) => {
-  res.send('Tech Talk Augusta Bot is running!');
-});
-
-// Handle 404 - Route not found
-app.use((req, res) => {
-  res.status(404).json({
-    status: 'error',
-    message: 'Route not found',
-    path: req.path,
-    timestamp: new Date().toISOString()
-  });
-});
 
 // Start all services
 initializeServices().catch(error => {
