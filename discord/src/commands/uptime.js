@@ -1,52 +1,45 @@
 const { EmbedBuilder } = require('discord.js');
 const { createHelpEmbed } = require('../utils/helpFormatter');
-const uptimeRobot = require('../modules/uptimerobot');
+
+const formatUptime = (uptime) => {
+    const days = Math.floor(uptime / (24 * 60 * 60));
+    const hours = Math.floor((uptime % (24 * 60 * 60)) / (60 * 60));
+    const minutes = Math.floor((uptime % (60 * 60)) / 60);
+    const seconds = Math.floor(uptime % 60);
+    
+    const parts = [];
+    if (days > 0) parts.push(`${days} day${days !== 1 ? 's' : ''}`);
+    if (hours > 0) parts.push(`${hours} hour${hours !== 1 ? 's' : ''}`);
+    if (minutes > 0) parts.push(`${minutes} minute${minutes !== 1 ? 's' : ''}`);
+    if (seconds > 0) parts.push(`${seconds} second${seconds !== 1 ? 's' : ''}`);
+    
+    return parts.join(', ');
+};
 
 const commands = {
     async status(message) {
-        try {
-            const embed = await uptimeRobot.createStatusEmbed();
-            await message.reply({ embeds: [embed] });
-        } catch (error) {
-            const errorEmbed = new EmbedBuilder()
-                .setTitle('❌ Error Fetching Status')
-                .setColor('#ff0000')
-                .setDescription(`Failed to fetch system status: ${error.message}`);
-            await message.reply({ embeds: [errorEmbed] });
-        }
-    },
-
-    async monitor(message) {
-        try {
-            await uptimeRobot.updateStatusMessage(message.client);
-            const embed = new EmbedBuilder()
-                .setTitle('✅ Status Channel Updated')
-                .setColor('#00ff00')
-                .setDescription('The status channel has been updated with the latest monitoring information.');
-            await message.reply({ embeds: [embed] });
-        } catch (error) {
-            const errorEmbed = new EmbedBuilder()
-                .setTitle('❌ Error Updating Status Channel')
-                .setColor('#ff0000')
-                .setDescription(`Failed to update status channel: ${error.message}`);
-            await message.reply({ embeds: [errorEmbed] });
-        }
+        const uptime = process.uptime();
+        const embed = new EmbedBuilder()
+            .setTitle('🤖 Bot Status')
+            .setColor('#00ff00')
+            .addFields(
+                { name: 'Status', value: '✅ Online', inline: true },
+                { name: 'Uptime', value: formatUptime(uptime), inline: true },
+                { name: 'Memory Usage', value: `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`, inline: true }
+            )
+            .setTimestamp();
+        await message.reply({ embeds: [embed] });
     },
 
     async help(message) {
         const helpEmbed = createHelpEmbed({
-            title: 'Uptime Monitoring Commands',
-            description: 'Monitor and manage system uptime status using UptimeRobot integration.',
-            emoji: '📊',
+            title: 'Bot Uptime Commands',
+            description: 'Check the bot\'s current status and uptime.',
+            emoji: '🤖',
             commands: [
                 { 
-                    name: '!uptime status', 
-                    value: 'Show current system status' 
-                },
-                { 
-                    name: '!uptime monitor', 
-                    value: 'Update the status monitoring channel',
-                    admin: true
+                    name: '!uptime', 
+                    value: 'Show current bot status and uptime' 
                 },
                 { 
                     name: '!uptime help', 
@@ -55,22 +48,14 @@ const commands = {
             ],
             examples: [
                 { 
-                    name: 'Check System Status',
-                    value: '!uptime status'
-                },
-                { 
-                    name: 'Update Status Channel',
-                    value: '!uptime monitor'
+                    name: 'Check Bot Status',
+                    value: '!uptime'
                 }
             ],
             notes: [
                 {
-                    name: 'Status Updates',
-                    value: 'The status channel is automatically updated every 5 minutes'
-                },
-                {
-                    name: 'Monitoring',
-                    value: 'System status is monitored using UptimeRobot'
+                    name: 'Health Checks',
+                    value: 'The bot provides a /health endpoint for external monitoring'
                 }
             ]
         });
@@ -81,7 +66,7 @@ const commands = {
 
 module.exports = {
     name: 'uptime',
-    description: 'Monitor system uptime and status',
+    description: 'Check bot uptime and status',
     async execute(message, args) {
         const subcommand = args[0]?.toLowerCase();
         
@@ -90,20 +75,7 @@ module.exports = {
             return;
         }
 
-        if (subcommand === 'monitor') {
-            // Check if user has admin permissions
-            if (!message.member.permissions.has('ADMINISTRATOR')) {
-                const embed = new EmbedBuilder()
-                    .setTitle('❌ Permission Denied')
-                    .setColor('#ff0000')
-                    .setDescription('You need administrator permissions to update the status channel.');
-                await message.reply({ embeds: [embed] });
-                return;
-            }
-            await commands.monitor(message);
-            return;
-        }
-
+        // Default to status if no subcommand provided
         await commands.status(message);
     }
 }; 
