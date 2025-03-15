@@ -8,7 +8,10 @@ const path = require('path');
 const express = require('express');
 const compression = require('compression');
 const app = express();
-const PORT = process.env.PORT || 3000;
+
+// Port configuration for Azure compatibility
+const PORT = process.env.PORT || process.env.WEBSITES_PORT || 8080;
+const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
 
 // Enable compression
 app.use(compression());
@@ -18,7 +21,9 @@ app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
     uptime: process.uptime(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    port: PORT,
+    node_version: process.version
   });
 });
 
@@ -37,10 +42,17 @@ app.use((err, req, res, next) => {
 });
 
 // Start Express server with error handling
-const server = app.listen(PORT, () => {
-  console.log(`Health check server listening on port ${PORT}`);
+const server = app.listen(PORT, HOST, () => {
+  console.log(`Health check server listening on ${HOST}:${PORT}`);
+  console.log(`Node.js version: ${process.version}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
 }).on('error', (error) => {
   console.error('Express server error:', error);
+  // Exit if we can't bind to the port
+  if (error.code === 'EACCES' || error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is not available. Exiting...`);
+    process.exit(1);
+  }
 });
 
 // Graceful shutdown handler
