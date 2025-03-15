@@ -207,6 +207,78 @@ class EventbriteManager {
             throw error;
         }
     }
+
+    async syncWithDiscord(meetupData) {
+        try {
+            console.log('Syncing Discord meetup with Eventbrite:', meetupData);
+
+            // Convert meetup time to start and end times
+            const [startTime, endTime] = meetupData.time.split(' - ').map(t => t.trim());
+            const startDate = new Date(`${meetupData.date} ${startTime}`);
+            const endDate = new Date(`${meetupData.date} ${endTime}`);
+
+            // Create event data payload
+            const eventData = {
+                event: {
+                    name: {
+                        html: meetupData.title
+                    },
+                    description: {
+                        html: meetupData.description
+                    },
+                    start: {
+                        timezone: 'America/New_York',
+                        utc: startDate.toISOString()
+                    },
+                    end: {
+                        timezone: 'America/New_York',
+                        utc: endDate.toISOString()
+                    },
+                    currency: 'USD',
+                    online_event: meetupData.location.toLowerCase().includes('online'),
+                    listed: true,
+                    shareable: true,
+                    capacity: 100,
+                    is_free: true
+                }
+            };
+
+            // If it's not an online event, add venue information
+            if (!eventData.event.online_event) {
+                eventData.event.venue = {
+                    name: meetupData.location
+                };
+            }
+
+            // Get organization ID first
+            const user = await this.getCurrentUser();
+            const organizationId = user.organizations[0]?.id;
+            
+            if (!organizationId) {
+                throw new Error('No organization found for the current user');
+            }
+
+            // Create the event
+            const response = await axios.post(
+                `${this.baseUrl}/organizations/${organizationId}/events/`,
+                eventData,
+                { headers: await this.getHeaders() }
+            );
+
+            if (response.status !== 200) {
+                throw new Error(`Failed to create Eventbrite event: ${response.data.error_description || 'Unknown error'}`);
+            }
+
+            // Return the event ID and URL
+            return {
+                eventbriteId: response.data.id,
+                eventbriteUrl: response.data.url
+            };
+        } catch (error) {
+            console.error('Failed to sync with Eventbrite:', error);
+            throw new Error(`Failed to create Eventbrite event: ${error.message}`);
+        }
+    }
 }
 
 module.exports = new EventbriteManager(); 
