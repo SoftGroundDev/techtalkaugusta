@@ -17,21 +17,17 @@ class DatabaseManager {
             // Configure mongoose
             mongoose.set('strictQuery', false);
             
-            // Add connection options
+            // Updated connection options for current MongoDB versions
             const options = {
                 useNewUrlParser: true,
                 useUnifiedTopology: true,
-                serverSelectionTimeoutMS: 10000, // Increased timeout
+                serverSelectionTimeoutMS: 10000,
                 socketTimeoutMS: 45000,
-                family: 4, // Use IPv4, skip trying IPv6
-                ssl: true,
-                sslValidate: true,
+                family: 4,
                 retryWrites: true,
                 w: 'majority',
                 maxPoolSize: 10,
-                minPoolSize: 1,
-                maxIdleTimeMS: 30000,
-                connectTimeoutMS: 10000
+                minPoolSize: 1
             };
 
             // Connect with retry logic
@@ -50,7 +46,7 @@ class DatabaseManager {
                         throw new Error(`Failed to connect after ${this.maxRetries} attempts`);
                     }
                     
-                    console.log(`Retrying in ${this.retryDelay/1000} seconds...`);
+                    console.log('Retrying in 5 seconds...');
                     await new Promise(resolve => setTimeout(resolve, this.retryDelay));
                 }
             }

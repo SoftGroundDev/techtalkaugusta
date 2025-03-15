@@ -7,6 +7,18 @@ class MeetupManager {
     constructor(client) {
         this.client = client;
         this.meetups = new Map();
+        
+        // Validate required environment variables
+        const missingVars = [];
+        if (!process.env.MONGODB_URI) missingVars.push('MONGODB_URI');
+        if (!process.env.EVENTBRITE_TOKEN) missingVars.push('EVENTBRITE_TOKEN');
+        
+        if (missingVars.length > 0) {
+            const errorMsg = `Missing required environment variables: ${missingVars.join(', ')}. Please check your .env file.`;
+            console.error(errorMsg);
+            throw new Error(errorMsg);
+        }
+        
         this.setupCronJobs();
         this.initialize();
     }
@@ -18,8 +30,10 @@ class MeetupManager {
                 await db.connect();
             }
             await this.loadMeetupsFromDB();
+            console.log('MeetupManager initialized successfully');
         } catch (error) {
             console.error('Failed to initialize MeetupManager:', error);
+            throw error;
         }
     }
 
