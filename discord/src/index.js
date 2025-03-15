@@ -22,10 +22,55 @@ app.get('/', (req, res) => {
   res.send('Tech Talk Augusta Bot is running!');
 });
 
-// Start Express server
-app.listen(PORT, () => {
-  console.log(`Health check server listening on port ${PORT}`);
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Express error:', err);
+  res.status(500).json({
+    status: 'error',
+    message: 'Internal server error',
+    timestamp: new Date().toISOString()
+  });
 });
+
+// Start Express server with error handling
+const server = app.listen(PORT, () => {
+  console.log(`Health check server listening on port ${PORT}`);
+}).on('error', (error) => {
+  console.error('Express server error:', error);
+});
+
+// Graceful shutdown handler
+const gracefulShutdown = async () => {
+  console.log('Initiating graceful shutdown...');
+  
+  // Close Express server
+  server.close(() => {
+    console.log('Express server closed');
+  });
+
+  // Close database connection
+  try {
+    await db.disconnect();
+    console.log('Database disconnected');
+  } catch (error) {
+    console.error('Error disconnecting from database:', error);
+  }
+
+  // Destroy Discord client
+  try {
+    await client.destroy();
+    console.log('Discord client destroyed');
+  } catch (error) {
+    console.error('Error destroying Discord client:', error);
+  }
+
+  // Exit process
+  process.exit(0);
+};
+
+// Handle shutdown signals
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
 
 // Memory usage monitoring
 const logMemoryUsage = () => {
@@ -109,18 +154,29 @@ client.once('ready', async () => {
   // Connect to database
   try {
     const dbOptions = {
-      ssl: true,
-      sslValidate: true,
+      ssl: process.env.NODE_ENV === 'production',
+      sslValidate: false, // Disable SSL certificate validation in production
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      tls: true,
-      tlsInsecure: false,
-      retryWrites: true
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 10000,
+      retryWrites: true,
+      maxPoolSize: 10,
+      minPoolSize: 0
     };
+    
+    console.log('Attempting to connect to MongoDB with options:', JSON.stringify(dbOptions, null, 2));
     await db.connect(dbOptions);
-    console.log('Database connection established');
+    console.log('Database connection established successfully');
   } catch (error) {
-    console.error('Failed to connect to database:', error);
+    console.error('Failed to connect to database:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      code: error.code
+    });
+    // Don't exit the process, allow the bot to run without DB if needed
   }
 
   // Initialize meetup schedule
@@ -185,23 +241,6 @@ process.on('unhandledRejection', (error, promise) => {
   console.error('Unhandled promise rejection:', error);
   console.error('Promise:', promise);
   console.error('Stack trace:', error.stack);
-});
-
-// Graceful shutdown
-process.on('SIGINT', async () => {
-  console.log('Received SIGINT signal...');
-  console.log('Cleaning up connections...');
-  try {
-    await db.disconnect();
-    console.log('Database disconnected');
-    await client.destroy();
-    console.log('Discord client destroyed');
-    console.log('Shutdown complete');
-    process.exit(0);
-  } catch (error) {
-    console.error('Error during shutdown:', error);
-    process.exit(1);
-  }
 });
 
 // Login to Discord with enhanced error handling
