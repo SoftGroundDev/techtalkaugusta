@@ -1,15 +1,17 @@
-name: Deploy to Azure Web App
+name: Deploy Discord Bot to Azure
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'discord/**'  # Only trigger on changes to discord directory
   workflow_dispatch:  # Allows manual trigger
 
 env:
   NODE_VERSION: '18.x'
   AZURE_WEBAPP_NAME: tech-talk-augusta-bot
-  AZURE_WEBAPP_PACKAGE_PATH: '.'
+  AZURE_WEBAPP_PACKAGE_PATH: './discord'  # Changed to discord directory
 
 jobs:
   build-and-deploy:
@@ -23,12 +25,15 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
+        cache-dependency-path: './discord/package-lock.json'
 
     - name: Install dependencies
+      working-directory: ./discord
       run: npm install
 
     - name: Zip artifact for deployment
-      run: zip -r release.zip ./* 
+      working-directory: ./discord
+      run: zip -r ../release.zip ./* 
 
     - name: Login to Azure
       uses: azure/login@v1
