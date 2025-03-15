@@ -287,15 +287,13 @@ const commands = {
 
         try {
             // Check if Eventbrite token is configured
-            if (!process.env.EVENTBRITE_TOKEN || !process.env.EVENTBRITE_ORGANIZATION_ID) {
+            if (!process.env.EVENTBRITE_TOKEN) {
                 const embed = new EmbedBuilder()
                     .setTitle('Configuration Error')
                     .setColor('#ff0000')
                     .setDescription(
                         '❌ Eventbrite integration is not properly configured.\n\n' +
-                        'Please make sure these environment variables are set:\n' +
-                        '• EVENTBRITE_TOKEN\n' +
-                        '• EVENTBRITE_ORGANIZATION_ID\n\n' +
+                        'Please make sure the EVENTBRITE_TOKEN environment variable is set.\n\n' +
                         'Contact the bot administrator for assistance.'
                     );
                 return message.reply({ embeds: [embed] });
@@ -330,17 +328,25 @@ const commands = {
                         'Please verify:\n' +
                         '• The event ID is correct\n' +
                         '• The event exists and is public\n' +
-                        '• The event belongs to your organization\n\n' +
+                        '• You have access to this event\n\n' +
                         `Event ID provided: ${eventbriteId}`
                     );
                 return message.reply({ embeds: [embed] });
             }
 
-            // Create the meetup
+            // Create the meetup using the meetup manager
             const meetup = await message.client.meetupManager.createMeetup({
-                ...meetupData,
-                eventbriteId: eventbriteId,
+                title: meetupData.title,
+                date: meetupData.date,
+                time: meetupData.time,
+                location: meetupData.location,
+                topic: meetupData.topic,
+                speaker: meetupData.speaker,
+                description: meetupData.description,
+                eventbriteId: meetupData.eventbriteId,
                 eventbriteUrl: meetupData.eventbriteUrl,
+                capacity: meetupData.capacity,
+                isFree: meetupData.isFree,
                 eventbriteSynced: true
             });
 
@@ -353,7 +359,7 @@ const commands = {
                     📋 Details:
                     • Discord Meetup ID: ${meetup.id}
                     • Title: ${meetup.title}
-                    • Date: ${meetup.date.toLocaleDateString()}
+                    • Date: ${meetup.date}
                     • Time: ${meetup.time}
                     • Location: ${meetup.location}
                     • Topic: ${meetup.topic}
