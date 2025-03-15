@@ -407,34 +407,12 @@ const commands = {
 
         try {
             const eventbrite = require('../modules/eventbrite');
+            const testResults = await eventbrite.testConnection();
             
-            // Test 1: Check environment variables
-            const configStatus = [];
-            if (process.env.EVENTBRITE_TOKEN) {
-                configStatus.push('✅ API Token is set');
-            } else {
-                configStatus.push('❌ API Token is missing');
-            }
-            if (process.env.EVENTBRITE_ORGANIZATION_ID) {
-                configStatus.push('✅ Organization ID is set');
-            } else {
-                configStatus.push('❌ Organization ID is missing');
-            }
-
-            // Test 2: Try to list organization events
-            let orgEvents;
-            try {
-                orgEvents = await eventbrite.listOrganizationEvents();
-                configStatus.push('✅ Successfully connected to Eventbrite API');
-                configStatus.push(`✅ Found ${orgEvents.length} events in your organization`);
-            } catch (error) {
-                configStatus.push(`❌ Failed to fetch organization events: ${error.message}`);
-            }
-
             const resultEmbed = new EmbedBuilder()
                 .setTitle('Eventbrite Connection Test Results')
-                .setColor(orgEvents ? '#00ff00' : '#ff9900')
-                .setDescription(configStatus.join('\n'))
+                .setColor(testResults.organizations.length > 0 ? '#00ff00' : '#ff9900')
+                .setDescription(testResults.status.join('\n'))
                 .addFields({
                     name: 'Configuration',
                     value: `
@@ -443,12 +421,12 @@ const commands = {
                     `.trim()
                 });
 
-            if (orgEvents && orgEvents.length > 0) {
+            if (testResults.organizations.length > 0) {
                 resultEmbed.addFields({
-                    name: 'Recent Events',
-                    value: orgEvents.slice(0, 3).map(event => 
-                        `• ${event.name.text} (ID: ${event.id})`
-                    ).join('\n')
+                    name: 'Available Organizations',
+                    value: testResults.organizations.map(org => 
+                        `${org.isCurrent ? '➡️' : '•'} ${org.name} (ID: ${org.id})`
+                    ).join('\n') + '\n\n*The ➡️ indicates your currently configured organization*'
                 });
             }
 

@@ -13,6 +13,61 @@ class EventbriteManager {
         if (!this.organizationId) {
             throw new Error('Eventbrite Organization ID is not configured');
         }
+
+        // Validate Organization ID format
+        if (!/^\d+$/.test(this.organizationId)) {
+            throw new Error(
+                'Invalid Eventbrite Organization ID format. ' +
+                'Please make sure you are using the numeric ID from your Eventbrite organization settings. ' +
+                'You can find this by:\n' +
+                '1. Log into Eventbrite\n' +
+                '2. Go to Organization Settings\n' +
+                '3. Look at the URL - it should contain /organizations/XXXXXX\n' +
+                '4. Use only the numeric portion'
+            );
+        }
+
+        console.log('Initializing Eventbrite Manager with:', {
+            tokenPrefix: this.apiToken.substring(0, 5) + '...',
+            organizationId: this.organizationId,
+            baseUrl: this.baseUrl
+        });
+    }
+
+    async validateOrganization() {
+        try {
+            const response = await axios.get(
+                `${this.baseUrl}/organizations/${this.organizationId}/`,
+                { 
+                    headers: await this.getHeaders(),
+                    validateStatus: null
+                }
+            );
+
+            if (response.status === 404) {
+                throw new Error(
+                    'Organization not found. ' +
+                    'Please verify your Organization ID in Eventbrite settings. ' +
+                    'Current ID: ' + this.organizationId
+                );
+            }
+
+            if (response.status !== 200) {
+                throw new Error(
+                    `Failed to validate organization: ${response.data.error_description || 'Unknown error'}`
+                );
+            }
+
+            console.log('Successfully validated organization:', {
+                name: response.data.name,
+                id: response.data.id
+            });
+
+            return true;
+        } catch (error) {
+            console.error('Organization validation failed:', error);
+            throw error;
+        }
     }
 
     async getHeaders() {
@@ -106,27 +161,50 @@ class EventbriteManager {
             console.log('Successfully fetched event data:', {
                 id: event.id,
                 name: event.name?.text,
-                start: event.start?.utc,
-                end: event.end?.utc
+                start: event.start,
+                end: event.end,
+                timezone: event.start?.timezone
             });
             
-            // Convert Eventbrite UTC dates to local time
+            if (!event.start?.utc || !event.end?.utc) {
+                throw new Error('Event start or end time is missing');
+            }
+
+            // Log raw date values
+            console.log('Raw start date:', event.start.utc);
+            console.log('Raw end date:', event.end.utc);
+            
+            // Convert Eventbrite UTC dates to local time (America/New_York)
             const startDate = new Date(event.start.utc);
             const endDate = new Date(event.end.utc);
             
-            // Format date as YYYY-MM-DD
-            const formattedDate = startDate.toISOString().split('T')[0];
+            console.log('Parsed dates:', {
+                startDate: startDate.toString(),
+                endDate: endDate.toString()
+            });
             
-            // Format time as HH:MM in 12-hour format with AM/PM
+            // Format date as YYYY-MM-DD
+            const formattedDate = startDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }).split('/').reverse().join('-');
+            
+            console.log('Formatted date:', formattedDate);
+            
+            // Format time as HH:MM AM/PM
             const formatTimeString = (date) => {
-                return date.toLocaleTimeString('en-US', { 
-                    hour: '2-digit', 
+                const timeStr = date.toLocaleTimeString('en-US', { 
+                    hour: 'numeric',
                     minute: '2-digit',
-                    hour12: true 
+                    hour12: true
                 });
+                console.log('Formatted time string:', timeStr);
+                return timeStr;
             };
             
             const timeStr = `${formatTimeString(startDate)} - ${formatTimeString(endDate)}`;
+            console.log('Final time string:', timeStr);
             
             // Extract venue information safely
             const location = event.venue 
@@ -135,7 +213,7 @@ class EventbriteManager {
             
             const meetupData = {
                 title: event.name.text,
-                description: event.description.text || '',
+                description: event.description?.text || '',
                 date: formattedDate,
                 time: timeStr,
                 location: location,
@@ -151,6 +229,10 @@ class EventbriteManager {
             return meetupData;
         } catch (error) {
             console.error('Failed to link Eventbrite event:', error);
+            // Add more context to the error
+            if (error.message === 'Invalid time value') {
+                throw new Error('Failed to process event times. Please ensure the event has valid start and end times.');
+            }
             throw error;
         }
     }
@@ -244,6 +326,9 @@ class EventbriteManager {
 
     async listOrganizationEvents() {
         try {
+            console.log('Validating organization before fetching events');
+            await this.validateOrganization();
+            
             console.log('Fetching organization events');
             const url = `${this.baseUrl}/organizations/${this.organizationId}/events/`;
             console.log('Request URL:', url);
@@ -262,7 +347,14 @@ class EventbriteManager {
             
             if (response.status !== 200) {
                 console.error('Error response:', response.data);
-                throw new Error(`Failed to list events: ${response.data.error_description || 'Unknown error'}`);
+                throw new Error(
+                    'Failed to list events: ' +
+                    (response.data.error_description || 'Unknown error') +
+                    '\n\nPlease verify:\n' +
+                    '1. Your Organization ID is correct\n' +
+                    '2. Your API token has permission to view this organization\n' +
+                    '3. The organization is active and accessible'
+                );
             }
 
             return response.data.events;
@@ -271,6 +363,86 @@ class EventbriteManager {
             throw new Error(
                 `Failed to list organization events: ${error.response?.data?.error_description || error.message}`
             );
+        }
+    }
+
+    async listAccessibleOrganizations() {
+        try {
+            console.log('Fetching all accessible organizations');
+            const url = `${this.baseUrl}/users/me/organizations/`;
+            console.log('Request URL:', url);
+
+            const response = await axios.get(url, {
+                headers: await this.getHeaders(),
+                validateStatus: null
+            });
+
+            console.log('Response status:', response.status);
+
+            if (response.status === 401) {
+                throw new Error('Invalid or expired API token. Please check your token.');
+            }
+
+            if (response.status !== 200) {
+                console.error('Error response:', response.data);
+                throw new Error(
+                    'Failed to list organizations: ' +
+                    (response.data.error_description || 'Unknown error')
+                );
+            }
+
+            return response.data.organizations;
+        } catch (error) {
+            console.error('Failed to list organizations:', error.response?.data || error);
+            throw error;
+        }
+    }
+
+    async testConnection() {
+        try {
+            // Test 1: Check environment variables
+            const configStatus = [];
+            if (this.apiToken) {
+                configStatus.push('✅ API Token is set');
+            } else {
+                configStatus.push('❌ API Token is missing');
+            }
+            if (this.organizationId) {
+                configStatus.push('✅ Organization ID is set');
+            } else {
+                configStatus.push('❌ Organization ID is missing');
+            }
+
+            // Test 2: List accessible organizations
+            const organizations = await this.listAccessibleOrganizations();
+            configStatus.push('✅ Successfully connected to Eventbrite API');
+            
+            if (organizations.length === 0) {
+                configStatus.push('⚠️ No organizations found for this API token');
+            } else {
+                configStatus.push(`✅ Found ${organizations.length} accessible organization(s)`);
+                
+                // Check if configured org ID is in the list
+                const configuredOrgExists = organizations.some(org => org.id === this.organizationId);
+                if (configuredOrgExists) {
+                    configStatus.push('✅ Configured Organization ID is valid');
+                } else {
+                    configStatus.push('❌ Configured Organization ID not found in accessible organizations');
+                }
+            }
+
+            return {
+                status: configStatus,
+                organizations: organizations.map(org => ({
+                    id: org.id,
+                    name: org.name,
+                    isCurrent: org.id === this.organizationId
+                }))
+            };
+
+        } catch (error) {
+            console.error('Connection test failed:', error);
+            throw error;
         }
     }
 }
