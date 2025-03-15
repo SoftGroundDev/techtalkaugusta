@@ -4,6 +4,27 @@ const MeetupManager = require('./modules/meetup');
 const db = require('./modules/database');
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Express health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/', (req, res) => {
+  res.send('Tech Talk Augusta Bot is running!');
+});
+
+// Start Express server
+app.listen(PORT, () => {
+  console.log(`Health check server listening on port ${PORT}`);
+});
 
 const client = new Client({
   intents: [
