@@ -1,4 +1,8 @@
-require('dotenv').config();
+// Load .env file only in development
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
