@@ -1,9 +1,8 @@
 const { EmbedBuilder } = require('discord.js');
 const os = require('os');
+const { createHelpEmbed } = require('../utils/helpFormatter');
 
-module.exports = {
-    name: 'status',
-    description: 'Check bot status and connections',
+const commands = {
     async execute(message) {
         const client = message.client;
         
@@ -67,5 +66,39 @@ module.exports = {
             .setTimestamp();
 
         await message.reply({ embeds: [embed] });
+    },
+
+    async help(message) {
+        const helpEmbed = createHelpEmbed({
+            title: '🤖 Status Command Help',
+            description: 'View detailed information about the bot\'s status, including connections, uptime, and system resources.',
+            commands: [
+                { name: '!status', value: 'Show detailed bot status' },
+                { name: '!status help', value: 'Show this help message' }
+            ],
+            examples: [
+                { 
+                    name: '!status', 
+                    value: 'Shows:\n• Connection status (Discord, Database)\n• Bot uptime\n• Memory usage\n• System resources\n• Bot statistics' 
+                }
+            ]
+        });
+
+        await message.reply({ embeds: [helpEmbed] });
+    }
+};
+
+module.exports = {
+    name: 'status',
+    description: 'Check bot status and connections',
+    async execute(message, args) {
+        const subcommand = args[0]?.toLowerCase();
+        
+        if (subcommand === 'help') {
+            await commands.help(message);
+            return;
+        }
+
+        await commands.execute(message);
     }
 }; 

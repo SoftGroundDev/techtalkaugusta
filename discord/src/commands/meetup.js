@@ -336,10 +336,10 @@ const commands = {
 
     async help(message) {
         const embed = new EmbedBuilder()
-            .setTitle('Tech Talk Augusta Bot Commands')
+            .setTitle('Meetup Commands')
             .setColor('#0099ff')
             .setDescription(`
-                Here are all available commands:
+                Available meetup commands:
                 
                 📅 **Meetup Management**
                 \`!meetup schedule\` - View upcoming meetups
@@ -352,13 +352,7 @@ const commands = {
                 \`!meetup rsvp <meetup_id> no\` - Decline attendance
                 \`!meetup rsvp <meetup_id> maybe\` - Maybe attending
                 
-                🔧 **Utility Commands**
-                \`!ping\` - Check bot's response time
-                
-                💡 **Examples:**
-                \`!meetup create "Tech Talk #42" "2024-04-15" "18:00" "Innovation Center" "AI Development" "John Doe"\`
-                \`!meetup rsvp 123456789 yes\`
-                \`!meetup link 987654321\`
+                For all bot commands, use \`!help\`
             `.trim());
         
         await message.reply({ embeds: [embed] });

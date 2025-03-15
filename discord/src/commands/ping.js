@@ -1,8 +1,7 @@
 const { EmbedBuilder } = require('discord.js');
+const { createHelpEmbed } = require('../utils/helpFormatter');
 
-module.exports = {
-    name: 'ping',
-    description: 'Check bot\'s response time',
+const commands = {
     async execute(message) {
         // Send initial message
         const sent = await message.reply('Pinging...');
@@ -34,5 +33,39 @@ module.exports = {
 
         // Edit the initial message with the embed
         await sent.edit({ content: null, embeds: [embed] });
+    },
+
+    async help(message) {
+        const helpEmbed = createHelpEmbed({
+            title: '🏓 Ping Command Help',
+            description: 'Check the bot\'s response time and connection status.',
+            commands: [
+                { name: '!ping', value: 'Show bot and WebSocket latency' },
+                { name: '!ping help', value: 'Show this help message' }
+            ],
+            examples: [
+                { 
+                    name: '!ping', 
+                    value: 'Returns the bot\'s response time and WebSocket latency in milliseconds.' 
+                }
+            ]
+        });
+
+        await message.reply({ embeds: [helpEmbed] });
+    }
+};
+
+module.exports = {
+    name: 'ping',
+    description: 'Check bot\'s response time',
+    async execute(message, args) {
+        const subcommand = args[0]?.toLowerCase();
+        
+        if (subcommand === 'help') {
+            await commands.help(message);
+            return;
+        }
+
+        await commands.execute(message);
     }
 }; 
