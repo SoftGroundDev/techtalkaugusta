@@ -6,7 +6,7 @@ const express = require('express');
 const app = express();
 
 // Port configuration for Azure compatibility
-const PORT = 8080;  // Azure App Service expects port 8080 for container health checks
+const port = process.env.port || 8080;  // Azure App Service expects port 8080 for container health checks
 const HOST = '0.0.0.0';  // Always use 0.0.0.0 in container environments
 
 // Simple health check endpoint
@@ -44,9 +44,19 @@ app.get('/', (req, res) => {
   res.send('Tech Talk Augusta Bot is running!');
 });
 
+// Handle 404 - Route not found
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Route not found',
+    path: req.path,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Start Express server
-const server = app.listen(PORT, HOST, () => {
-  console.log(`Server listening on ${HOST}:${PORT}`);
+const server = app.listen(port, HOST, () => {
+  console.log(`Server listening on ${HOST}:${port}`);
 });
 
 // Graceful shutdown handler

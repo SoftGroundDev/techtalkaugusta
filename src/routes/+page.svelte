@@ -74,9 +74,9 @@
 	<h3 class="mb-3 text-xl">Call For Speakers</h3>
 	<p class="mb-3">
 		Volunteering to speak at tech meetups is crucial because it fosters knowledge sharing and
-		community growth. Without speakers, there’s no content, no learning, and no opportunity for
+		community growth. Without speakers, there's no content, no learning, and no opportunity for
 		networking or collaboration. By sharing your expertise, you inspire others, spark innovation,
-		and help build a stronger, more connected tech community. Plus, it’s a chance to give back and
+		and help build a stronger, more connected tech community. Plus, it's a chance to give back and
 		elevate the industry as a whole!
 	</p>
 	<a href="/forms/call-for-speakers">Apply to be a Speaker!</a>
@@ -99,7 +99,7 @@
 		<br /><br />
 		As the home of the Army Cyber Center of Excellence, the Augusta National, Georgia Cyber Center, and
 		the Savannah River Nuclear Site, our city is no stranger to world-class projects and cutting-edge
-		expertise. Yet, while these institutions bring incredible resources and talent, there’s a missing
+		expertise. Yet, while these institutions bring incredible resources and talent, there's a missing
 		piece, support for: small businesses, local software developers, and the vibrant downtown community.
 		<br /><br />
 		At Tech Talk Augusta, we believe in the power of technology to shape a better future for everyone
@@ -168,8 +168,9 @@
 	}
 
 	.welcome {
-		display: block;
-		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		width: 100%;
 		padding: 30px 0;
 	}
@@ -177,6 +178,6 @@
 	.welcome img {
 		width: 100%;
 		max-width: 300px;
-		display: inline-block;
+		display: block;
 	}
 </style>
