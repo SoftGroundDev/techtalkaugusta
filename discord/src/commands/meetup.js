@@ -335,27 +335,77 @@ const commands = {
     },
 
     async help(message) {
-        const embed = new EmbedBuilder()
-            .setTitle('Meetup Commands')
-            .setColor('#0099ff')
-            .setDescription(`
-                Available meetup commands:
+        const helpEmbed = createHelpEmbed({
+            title: 'Meetup Commands Help',
+            description: 'Manage Tech Talk Augusta meetups, including scheduling, RSVPs, and Eventbrite integration.',
+            emoji: '📅',
+            commands: [
+                // Schedule Commands
+                { 
+                    name: '!meetup schedule', 
+                    value: 'View all upcoming meetups'
+                },
+                { 
+                    name: '!meetup rsvp <id> <response>', 
+                    value: 'RSVP to a meetup (yes/no/maybe)'
+                },
                 
-                📅 **Meetup Management**
-                \`!meetup schedule\` - View upcoming meetups
-                \`!meetup create "Title" "YYYY-MM-DD" "HH:MM" "Location" "Topic" "Speaker"\` - Create a new meetup (Admin)
-                \`!meetup link <eventbrite_id>\` - Link existing Eventbrite event (Admin)
-                \`!meetup cancel <meetup_id>\` - Cancel a meetup (Admin)
-                
-                👥 **RSVP Commands**
-                \`!meetup rsvp <meetup_id> yes\` - Confirm attendance
-                \`!meetup rsvp <meetup_id> no\` - Decline attendance
-                \`!meetup rsvp <meetup_id> maybe\` - Maybe attending
-                
-                For all bot commands, use \`!help\`
-            `.trim());
+                // Admin Commands
+                { 
+                    name: '!meetup create', 
+                    value: 'Create a new meetup event',
+                    admin: true
+                },
+                { 
+                    name: '!meetup link <eventbrite_id>', 
+                    value: 'Link existing Eventbrite event',
+                    admin: true
+                },
+                { 
+                    name: '!meetup cancel <id>', 
+                    value: 'Cancel an existing meetup',
+                    admin: true
+                }
+            ],
+            examples: [
+                { 
+                    name: 'Create a Meetup',
+                    value: '!meetup create "Tech Talk #42" "2024-04-15" "18:00" "Innovation Center" "AI Development" "John Doe"'
+                },
+                {
+                    name: 'Link Eventbrite Event',
+                    value: '!meetup link 123456789\n\n# The Eventbrite ID can be found in your event URL:\nhttps://www.eventbrite.com/e/event-name-123456789'
+                },
+                {
+                    name: 'RSVP to Event',
+                    value: '!meetup rsvp 987654321 yes'
+                }
+            ],
+            notes: [
+                {
+                    name: 'Eventbrite Setup',
+                    value: 'Make sure your Eventbrite API token and Organization ID are set in the bot\'s environment variables'
+                },
+                {
+                    name: 'Finding Eventbrite ID',
+                    value: 'The event ID is the number at the end of your Eventbrite event URL'
+                },
+                {
+                    name: 'RSVP Options',
+                    value: 'Use "yes", "no", or "maybe" when RSVPing to events'
+                },
+                {
+                    name: 'Admin Access',
+                    value: 'Creating, linking, and canceling events requires Admin, Moderator, or Event Organizer role'
+                },
+                {
+                    name: 'Troubleshooting',
+                    value: 'If linking fails, verify:\n• The event ID is correct\n• The event exists and is public\n• Your Eventbrite API token has correct permissions\n• The event belongs to your organization'
+                }
+            ]
+        });
         
-        await message.reply({ embeds: [embed] });
+        await message.reply({ embeds: [helpEmbed] });
     }
 };
 

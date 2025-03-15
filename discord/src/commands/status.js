@@ -70,16 +70,41 @@ const commands = {
 
     async help(message) {
         const helpEmbed = createHelpEmbed({
-            title: '🤖 Status Command Help',
-            description: 'View detailed information about the bot\'s status, including connections, uptime, and system resources.',
+            title: 'Status Command Help',
+            description: 'View detailed information about the bot\'s current status, including connection health, system resources, and statistics.',
+            emoji: '🤖',
             commands: [
-                { name: '!status', value: 'Show detailed bot status' },
-                { name: '!status help', value: 'Show this help message' }
+                { 
+                    name: '!status', 
+                    value: 'Display comprehensive bot status information' 
+                },
+                { 
+                    name: '!status help', 
+                    value: 'Show this help message' 
+                }
             ],
             examples: [
                 { 
-                    name: '!status', 
-                    value: 'Shows:\n• Connection status (Discord, Database)\n• Bot uptime\n• Memory usage\n• System resources\n• Bot statistics' 
+                    name: 'Check Bot Status',
+                    value: '!status'
+                }
+            ],
+            notes: [
+                {
+                    name: 'Connection Status',
+                    value: 'Shows Discord WebSocket and database connection health'
+                },
+                {
+                    name: 'System Resources',
+                    value: 'Displays memory usage and system statistics'
+                },
+                {
+                    name: 'Bot Statistics',
+                    value: 'Shows the number of servers, channels, and users the bot is connected to'
+                },
+                {
+                    name: 'Uptime',
+                    value: 'Indicates how long the bot has been running since last restart'
                 }
             ]
         });

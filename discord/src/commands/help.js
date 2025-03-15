@@ -15,37 +15,72 @@ module.exports = {
 
         const helpEmbed = createHelpEmbed({
             title: 'Tech Talk Augusta Bot Commands',
-            description: 'Here are all available commands. Type `!<command> help` for detailed help with any command.',
+            description: 'Welcome to the Tech Talk Augusta Bot! Below are all available commands. Each command has its own detailed help message that you can access using `!<command> help`.',
+            emoji: '🔍',
             commands: [
-                { name: '📅 Meetup Management', value: 
-                    `\`!meetup schedule\` - View upcoming meetups
-\`!meetup create "Title" "YYYY-MM-DD" "HH:MM" "Location" "Topic" "Speaker"\` - Create a new meetup (Admin)
-\`!meetup link <eventbrite_id>\` - Link existing Eventbrite event (Admin)
-\`!meetup cancel <meetup_id>\` - Cancel a meetup (Admin)`
+                // Meetup Management Commands (Admin)
+                { 
+                    name: '!meetup create', 
+                    value: 'Create a new meetup event',
+                    admin: true
                 },
-                { name: '👥 RSVP Commands', value:
-                    `\`!meetup rsvp <meetup_id> yes\` - Confirm attendance
-\`!meetup rsvp <meetup_id> no\` - Decline attendance
-\`!meetup rsvp <meetup_id> maybe\` - Maybe attending`
+                { 
+                    name: '!meetup link', 
+                    value: 'Link an Eventbrite event',
+                    admin: true
                 },
-                { name: '🔧 Utility Commands', value:
-                    `\`!help\` - Show this help message
-\`!ping\` - Check bot's response time
-\`!status\` - View bot's status and health`
+                { 
+                    name: '!meetup cancel', 
+                    value: 'Cancel an existing meetup',
+                    admin: true
+                },
+                
+                // Regular Meetup Commands
+                { 
+                    name: '!meetup schedule', 
+                    value: 'View all upcoming meetups'
+                },
+                { 
+                    name: '!meetup rsvp', 
+                    value: 'RSVP to a meetup'
+                },
+                
+                // Utility Commands
+                { 
+                    name: '!help', 
+                    value: 'Show this help message'
+                },
+                { 
+                    name: '!ping', 
+                    value: 'Check bot\'s response time'
+                },
+                { 
+                    name: '!status', 
+                    value: 'View bot\'s health and stats'
                 }
             ],
             examples: [
                 { 
-                    name: '!help', 
-                    value: 'Show this help message' 
+                    name: 'Get General Help',
+                    value: '!help'
                 },
                 { 
-                    name: '!help ping', 
-                    value: 'Get help with the ping command' 
+                    name: 'Get Command-Specific Help',
+                    value: '!meetup help\n!ping help\n!status help'
+                }
+            ],
+            notes: [
+                {
+                    name: 'Command Help',
+                    value: 'Each command has detailed help available via `!<command> help`'
                 },
-                { 
-                    name: '!ping help', 
-                    value: 'Get detailed help with the ping command' 
+                {
+                    name: 'Admin Commands',
+                    value: 'Commands marked with ⚡ require administrator permissions'
+                },
+                {
+                    name: 'RSVP Options',
+                    value: 'When RSVPing, you can use: yes, no, or maybe'
                 }
             ]
         });

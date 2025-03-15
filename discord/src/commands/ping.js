@@ -37,16 +37,33 @@ const commands = {
 
     async help(message) {
         const helpEmbed = createHelpEmbed({
-            title: '🏓 Ping Command Help',
-            description: 'Check the bot\'s response time and connection status.',
+            title: 'Ping Command Help',
+            description: 'Check the bot\'s response time and connection status. This command helps verify that the bot is responsive and shows the current latency between the bot and Discord servers.',
+            emoji: '🏓',
             commands: [
-                { name: '!ping', value: 'Show bot and WebSocket latency' },
-                { name: '!ping help', value: 'Show this help message' }
+                { 
+                    name: '!ping', 
+                    value: 'Test bot response time and show latency' 
+                },
+                { 
+                    name: '!ping help', 
+                    value: 'Display this help message' 
+                }
             ],
             examples: [
                 { 
-                    name: '!ping', 
-                    value: 'Returns the bot\'s response time and WebSocket latency in milliseconds.' 
+                    name: 'Basic Usage',
+                    value: '!ping'
+                }
+            ],
+            notes: [
+                {
+                    name: 'Bot Latency',
+                    value: 'Shows the time it takes for the bot to process and respond to your message'
+                },
+                {
+                    name: 'WebSocket Latency',
+                    value: 'Shows the connection speed between the bot and Discord\'s servers'
                 }
             ]
         });

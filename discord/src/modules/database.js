@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 class DatabaseManager {
     constructor() {
         this.isConnected = false;
+        this.connectionRetries = 0;
+        this.maxRetries = 5;
+        this.retryDelay = 5000; // 5 seconds
     }
 
     async connect() {
@@ -11,23 +14,55 @@ class DatabaseManager {
                 throw new Error('MongoDB URI not found in environment variables');
             }
 
-            await mongoose.connect(process.env.MONGODB_URI, {
+            // Configure mongoose
+            mongoose.set('strictQuery', false);
+            
+            // Add connection options
+            const options = {
                 useNewUrlParser: true,
                 useUnifiedTopology: true,
-            });
+                serverSelectionTimeoutMS: 5000,
+                socketTimeoutMS: 45000,
+                family: 4 // Use IPv4, skip trying IPv6
+            };
 
-            this.isConnected = true;
-            console.log('Connected to MongoDB successfully');
+            // Connect with retry logic
+            while (this.connectionRetries < this.maxRetries) {
+                try {
+                    await mongoose.connect(process.env.MONGODB_URI, options);
+                    this.isConnected = true;
+                    this.connectionRetries = 0;
+                    console.log('Connected to MongoDB successfully');
+                    break;
+                } catch (error) {
+                    this.connectionRetries++;
+                    console.error(`MongoDB connection attempt ${this.connectionRetries} failed:`, error.message);
+                    
+                    if (this.connectionRetries === this.maxRetries) {
+                        throw new Error(`Failed to connect after ${this.maxRetries} attempts`);
+                    }
+                    
+                    console.log(`Retrying in ${this.retryDelay/1000} seconds...`);
+                    await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+                }
+            }
 
-            // Handle connection errors
+            // Handle connection events
             mongoose.connection.on('error', (error) => {
                 console.error('MongoDB connection error:', error);
                 this.isConnected = false;
+                this.attemptReconnect();
             });
 
             mongoose.connection.on('disconnected', () => {
                 console.log('MongoDB disconnected');
                 this.isConnected = false;
+                this.attemptReconnect();
+            });
+
+            mongoose.connection.on('connected', () => {
+                console.log('MongoDB connected');
+                this.isConnected = true;
             });
 
             // Create schemas and models
@@ -35,7 +70,19 @@ class DatabaseManager {
 
         } catch (error) {
             console.error('Failed to connect to MongoDB:', error);
+            this.isConnected = false;
             throw error;
+        }
+    }
+
+    async attemptReconnect() {
+        if (!this.isConnected && this.connectionRetries < this.maxRetries) {
+            console.log('Attempting to reconnect to MongoDB...');
+            try {
+                await this.connect();
+            } catch (error) {
+                console.error('Reconnection attempt failed:', error);
+            }
         }
     }
 
