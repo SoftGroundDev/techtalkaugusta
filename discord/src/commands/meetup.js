@@ -383,6 +383,99 @@ const commands = {
         }
     },
 
+    async testEventbrite(message) {
+        // Enhanced permission check
+        if (!hasAdminPermission(message.member)) {
+            const embed = new EmbedBuilder()
+                .setTitle('Permission Denied')
+                .setColor('#ff0000')
+                .setDescription(
+                    '❌ You do not have permission to test Eventbrite integration.\n\n' +
+                    'Required permissions:\n' +
+                    '• Discord Administrator, OR\n' +
+                    '• One of these roles: Admin, Moderator, Event Organizer'
+                );
+            return message.reply({ embeds: [embed] });
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle('Testing Eventbrite Connection')
+            .setColor('#0099ff')
+            .setDescription('🔄 Testing Eventbrite integration...');
+        
+        const statusMessage = await message.reply({ embeds: [embed] });
+
+        try {
+            const eventbrite = require('../modules/eventbrite');
+            
+            // Test 1: Check environment variables
+            const configStatus = [];
+            if (process.env.EVENTBRITE_TOKEN) {
+                configStatus.push('✅ API Token is set');
+            } else {
+                configStatus.push('❌ API Token is missing');
+            }
+            if (process.env.EVENTBRITE_ORGANIZATION_ID) {
+                configStatus.push('✅ Organization ID is set');
+            } else {
+                configStatus.push('❌ Organization ID is missing');
+            }
+
+            // Test 2: Try to list organization events
+            let orgEvents;
+            try {
+                orgEvents = await eventbrite.listOrganizationEvents();
+                configStatus.push('✅ Successfully connected to Eventbrite API');
+                configStatus.push(`✅ Found ${orgEvents.length} events in your organization`);
+            } catch (error) {
+                configStatus.push(`❌ Failed to fetch organization events: ${error.message}`);
+            }
+
+            const resultEmbed = new EmbedBuilder()
+                .setTitle('Eventbrite Connection Test Results')
+                .setColor(orgEvents ? '#00ff00' : '#ff9900')
+                .setDescription(configStatus.join('\n'))
+                .addFields({
+                    name: 'Configuration',
+                    value: `
+                        • Organization ID: ${process.env.EVENTBRITE_ORGANIZATION_ID}
+                        • API Token: ${process.env.EVENTBRITE_TOKEN ? '****' + process.env.EVENTBRITE_TOKEN.slice(-4) : 'Not set'}
+                    `.trim()
+                });
+
+            if (orgEvents && orgEvents.length > 0) {
+                resultEmbed.addFields({
+                    name: 'Recent Events',
+                    value: orgEvents.slice(0, 3).map(event => 
+                        `• ${event.name.text} (ID: ${event.id})`
+                    ).join('\n')
+                });
+            }
+
+            await statusMessage.edit({ embeds: [resultEmbed] });
+        } catch (error) {
+            console.error('Failed to test Eventbrite connection:', error);
+            const errorEmbed = new EmbedBuilder()
+                .setTitle('Eventbrite Connection Test Failed')
+                .setColor('#ff0000')
+                .setDescription(`
+                    ❌ Failed to test Eventbrite connection
+                    
+                    Error details:
+                    \`\`\`
+                    ${error.message}
+                    \`\`\`
+                    
+                    Please check:
+                    • Your Eventbrite API token is valid
+                    • Your Organization ID is correct
+                    • You have the necessary permissions
+                `.trim());
+            
+            await statusMessage.edit({ embeds: [errorEmbed] });
+        }
+    },
+
     async help(message) {
         const helpEmbed = createHelpEmbed({
             title: 'Meetup Commands Help',
@@ -413,6 +506,11 @@ const commands = {
                 { 
                     name: '!meetup cancel <id>', 
                     value: 'Cancel an existing meetup',
+                    admin: true
+                },
+                { 
+                    name: '!meetup testEventbrite', 
+                    value: 'Test Eventbrite integration',
                     admin: true
                 }
             ],
