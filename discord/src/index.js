@@ -59,23 +59,6 @@ client.on('messageCreate', async (message) => {
         console.error(error);
         await message.reply('There was an error executing that command.');
       }
-      return;
-    }
-
-    // Legacy command handling
-    switch (commandName) {
-      case 'help':
-        message.reply(
-          '**Tech Talk Augusta Bot Commands:**\n' +
-          '`!meetup schedule` - View upcoming meetups\n' +
-          '`!meetup create` - Create a new meetup\n' +
-          '`!meetup rsvp` - RSVP to a meetup\n' +
-          '`!meetup cancel` - Cancel a meetup\n' +
-          '`!suggest` - Suggest a meetup topic\n' +
-          '`!resources` - Share or view tech resources\n' +
-          '`!poll` - Create a poll (admin only)\n'
-        );
-        break;
     }
   }
 });

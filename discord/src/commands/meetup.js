@@ -332,6 +332,36 @@ const commands = {
                 );
             await message.reply({ embeds: [embed] });
         }
+    },
+
+    async help(message) {
+        const embed = new EmbedBuilder()
+            .setTitle('Tech Talk Augusta Bot Commands')
+            .setColor('#0099ff')
+            .setDescription(`
+                Here are all available commands:
+                
+                📅 **Meetup Management**
+                \`!meetup schedule\` - View upcoming meetups
+                \`!meetup create "Title" "YYYY-MM-DD" "HH:MM" "Location" "Topic" "Speaker"\` - Create a new meetup (Admin)
+                \`!meetup link <eventbrite_id>\` - Link existing Eventbrite event (Admin)
+                \`!meetup cancel <meetup_id>\` - Cancel a meetup (Admin)
+                
+                👥 **RSVP Commands**
+                \`!meetup rsvp <meetup_id> yes\` - Confirm attendance
+                \`!meetup rsvp <meetup_id> no\` - Decline attendance
+                \`!meetup rsvp <meetup_id> maybe\` - Maybe attending
+                
+                🔧 **Utility Commands**
+                \`!ping\` - Check bot's response time
+                
+                💡 **Examples:**
+                \`!meetup create "Tech Talk #42" "2024-04-15" "18:00" "Innovation Center" "AI Development" "John Doe"\`
+                \`!meetup rsvp 123456789 yes\`
+                \`!meetup link 987654321\`
+            `.trim());
+        
+        await message.reply({ embeds: [embed] });
     }
 };
 
@@ -342,25 +372,8 @@ module.exports = {
         const subcommand = args.shift();
         
         if (!subcommand || !commands[subcommand]) {
-            const embed = new EmbedBuilder()
-                .setTitle('Meetup Commands')
-                .setColor('#0099ff')
-                .setDescription(`
-                    Available commands:
-                    
-                    📅 **View Schedule**
-                    \`!meetup schedule\` - View upcoming meetups
-                    
-                    ✨ **Create Meetup** (Admin only)
-                    \`!meetup create "Title" "YYYY-MM-DD" "HH:MM" "Location" "Topic" "Speaker"\`
-                    
-                    👥 **RSVP to Meetup**
-                    \`!meetup rsvp <meetup_id> [yes/no/maybe]\`
-                    
-                    ❌ **Cancel Meetup** (Admin only)
-                    \`!meetup cancel <meetup_id>\`
-                `.trim());
-            return message.reply({ embeds: [embed] });
+            await commands.help(message);
+            return;
         }
 
         await commands[subcommand](message, args);
