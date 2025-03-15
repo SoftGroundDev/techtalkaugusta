@@ -3,71 +3,16 @@ const axios = require('axios');
 class EventbriteManager {
     constructor() {
         this.apiToken = process.env.EVENTBRITE_TOKEN;
-        this.organizationId = process.env.EVENTBRITE_ORGANIZATION_ID;
         this.baseUrl = 'https://www.eventbriteapi.com/v3';
 
         if (!this.apiToken) {
             throw new Error('Eventbrite API token is not configured');
         }
 
-        if (!this.organizationId) {
-            throw new Error('Eventbrite Organization ID is not configured');
-        }
-
-        // Validate Organization ID format
-        if (!/^\d+$/.test(this.organizationId)) {
-            throw new Error(
-                'Invalid Eventbrite Organization ID format. ' +
-                'Please make sure you are using the numeric ID from your Eventbrite organization settings. ' +
-                'You can find this by:\n' +
-                '1. Log into Eventbrite\n' +
-                '2. Go to Organization Settings\n' +
-                '3. Look at the URL - it should contain /organizations/XXXXXX\n' +
-                '4. Use only the numeric portion'
-            );
-        }
-
         console.log('Initializing Eventbrite Manager with:', {
             tokenPrefix: this.apiToken.substring(0, 5) + '...',
-            organizationId: this.organizationId,
             baseUrl: this.baseUrl
         });
-    }
-
-    async validateOrganization() {
-        try {
-            const response = await axios.get(
-                `${this.baseUrl}/organizations/${this.organizationId}/`,
-                { 
-                    headers: await this.getHeaders(),
-                    validateStatus: null
-                }
-            );
-
-            if (response.status === 404) {
-                throw new Error(
-                    'Organization not found. ' +
-                    'Please verify your Organization ID in Eventbrite settings. ' +
-                    'Current ID: ' + this.organizationId
-                );
-            }
-
-            if (response.status !== 200) {
-                throw new Error(
-                    `Failed to validate organization: ${response.data.error_description || 'Unknown error'}`
-                );
-            }
-
-            console.log('Successfully validated organization:', {
-                name: response.data.name,
-                id: response.data.id
-            });
-
-            return true;
-        } catch (error) {
-            console.error('Organization validation failed:', error);
-            throw error;
-        }
     }
 
     async getHeaders() {
@@ -102,7 +47,6 @@ class EventbriteManager {
             const numericId = this.extractEventId(eventId);
             console.log('Fetching event with ID:', numericId);
             console.log('Using API token:', this.apiToken.substring(0, 5) + '...');
-            console.log('Using organization ID:', this.organizationId);
 
             const headers = await this.getHeaders();
             console.log('Request headers:', headers);
@@ -137,18 +81,6 @@ class EventbriteManager {
             return response.data;
         } catch (error) {
             console.error('Failed to fetch Eventbrite event:', error.response?.data || error.message);
-            
-            // If it's an axios error with response data, format it nicely
-            if (error.response?.data) {
-                const errorData = error.response.data;
-                throw new Error(
-                    `Eventbrite API Error:\n` +
-                    `Status: ${error.response.status}\n` +
-                    `Error: ${errorData.error || 'Unknown'}\n` +
-                    `Description: ${errorData.error_description || 'No description provided'}`
-                );
-            }
-            
             throw error;
         }
     }
@@ -170,18 +102,9 @@ class EventbriteManager {
                 throw new Error('Event start or end time is missing');
             }
 
-            // Log raw date values
-            console.log('Raw start date:', event.start.utc);
-            console.log('Raw end date:', event.end.utc);
-            
             // Convert Eventbrite UTC dates to local time (America/New_York)
             const startDate = new Date(event.start.utc);
             const endDate = new Date(event.end.utc);
-            
-            console.log('Parsed dates:', {
-                startDate: startDate.toString(),
-                endDate: endDate.toString()
-            });
             
             // Format date as YYYY-MM-DD
             const formattedDate = startDate.toLocaleDateString('en-US', {
@@ -190,21 +113,16 @@ class EventbriteManager {
                 day: '2-digit'
             }).split('/').reverse().join('-');
             
-            console.log('Formatted date:', formattedDate);
-            
             // Format time as HH:MM AM/PM
             const formatTimeString = (date) => {
-                const timeStr = date.toLocaleTimeString('en-US', { 
+                return date.toLocaleTimeString('en-US', { 
                     hour: 'numeric',
                     minute: '2-digit',
                     hour12: true
                 });
-                console.log('Formatted time string:', timeStr);
-                return timeStr;
             };
             
             const timeStr = `${formatTimeString(startDate)} - ${formatTimeString(endDate)}`;
-            console.log('Final time string:', timeStr);
             
             // Extract venue information safely
             const location = event.venue 
@@ -229,217 +147,61 @@ class EventbriteManager {
             return meetupData;
         } catch (error) {
             console.error('Failed to link Eventbrite event:', error);
-            // Add more context to the error
-            if (error.message === 'Invalid time value') {
-                throw new Error('Failed to process event times. Please ensure the event has valid start and end times.');
-            }
             throw error;
         }
     }
 
-    async createEvent(eventData) {
+    async getCurrentUser() {
         try {
-            const response = await axios.post(
-                `${this.baseUrl}/organizations/${this.organizationId}/events/`,
-                {
-                    event: {
-                        name: { html: eventData.title },
-                        description: { html: eventData.description || '' },
-                        start: {
-                            timezone: 'America/New_York',
-                            utc: new Date(`${eventData.date}T${eventData.time}`).toISOString()
-                        },
-                        end: {
-                            timezone: 'America/New_York',
-                            utc: new Date(`${eventData.date}T${eventData.time}`).toISOString()
-                        },
-                        venue_id: process.env.EVENTBRITE_VENUE_ID,
-                        capacity: 100,
-                        currency: 'USD',
-                        online_event: false,
-                        listed: true,
-                        shareable: true,
-                        invite_only: false,
-                        show_remaining: true,
-                        is_free: true
-                    }
-                },
-                { headers: await this.getHeaders() }
-            );
-            return response.data;
-        } catch (error) {
-            console.error('Failed to create Eventbrite event:', error.response?.data || error.message);
-            throw error;
-        }
-    }
-
-    async cancelEvent(eventId) {
-        try {
-            const response = await axios.post(
-                `${this.baseUrl}/events/${eventId}/cancel/`,
-                { headers: await this.getHeaders() }
-            );
-            return response.data;
-        } catch (error) {
-            console.error('Failed to cancel Eventbrite event:', error.response?.data || error.message);
-            throw error;
-        }
-    }
-
-    async getAttendees(eventId) {
-        try {
-            const response = await axios.get(
-                `${this.baseUrl}/events/${eventId}/attendees/`,
-                { headers: await this.getHeaders() }
-            );
-            return response.data.attendees;
-        } catch (error) {
-            console.error('Failed to fetch Eventbrite attendees:', error.response?.data || error.message);
-            throw error;
-        }
-    }
-
-    async syncWithDiscord(meetup) {
-        try {
-            // Create Eventbrite event
-            const eventbriteEvent = await this.createEvent({
-                title: meetup.title,
-                description: `
-                    <h2>${meetup.topic}</h2>
-                    <p><strong>Speaker:</strong> ${meetup.speaker}</p>
-                    <p><strong>Location:</strong> ${meetup.location}</p>
-                    <p>Join us for this Tech Talk Augusta meetup!</p>
-                `,
-                date: meetup.date.toISOString().split('T')[0],
-                time: meetup.time
-            });
-
-            return {
-                eventbriteId: eventbriteEvent.id,
-                eventbriteUrl: eventbriteEvent.url
-            };
-        } catch (error) {
-            console.error('Failed to sync with Eventbrite:', error);
-            throw error;
-        }
-    }
-
-    async listOrganizationEvents() {
-        try {
-            console.log('Validating organization before fetching events');
-            await this.validateOrganization();
+            console.log('Fetching current user information');
+            const url = `${this.baseUrl}/users/me/`;
             
-            console.log('Fetching organization events');
-            const url = `${this.baseUrl}/organizations/${this.organizationId}/events/`;
-            console.log('Request URL:', url);
-            
-            const response = await axios.get(url, {
-                headers: await this.getHeaders(),
-                params: {
-                    status: 'live',
-                    order_by: 'start_desc',
-                    time_filter: 'current_future'
-                },
-                validateStatus: null
-            });
-
-            console.log('Response status:', response.status);
-            
-            if (response.status !== 200) {
-                console.error('Error response:', response.data);
-                throw new Error(
-                    'Failed to list events: ' +
-                    (response.data.error_description || 'Unknown error') +
-                    '\n\nPlease verify:\n' +
-                    '1. Your Organization ID is correct\n' +
-                    '2. Your API token has permission to view this organization\n' +
-                    '3. The organization is active and accessible'
-                );
-            }
-
-            return response.data.events;
-        } catch (error) {
-            console.error('Failed to list organization events:', error.response?.data || error);
-            throw new Error(
-                `Failed to list organization events: ${error.response?.data?.error_description || error.message}`
-            );
-        }
-    }
-
-    async listAccessibleOrganizations() {
-        try {
-            console.log('Fetching all accessible organizations');
-            const url = `${this.baseUrl}/users/me/organizations/`;
-            console.log('Request URL:', url);
-
             const response = await axios.get(url, {
                 headers: await this.getHeaders(),
                 validateStatus: null
             });
-
-            console.log('Response status:', response.status);
 
             if (response.status === 401) {
                 throw new Error('Invalid or expired API token. Please check your token.');
             }
 
             if (response.status !== 200) {
-                console.error('Error response:', response.data);
                 throw new Error(
-                    'Failed to list organizations: ' +
+                    'Failed to fetch user information: ' +
                     (response.data.error_description || 'Unknown error')
                 );
             }
 
-            return response.data.organizations;
+            return response.data;
         } catch (error) {
-            console.error('Failed to list organizations:', error.response?.data || error);
+            console.error('Failed to fetch user information:', error);
             throw error;
         }
     }
 
     async testConnection() {
         try {
-            // Test 1: Check environment variables
+            // Test 1: Check API token
             const configStatus = [];
             if (this.apiToken) {
                 configStatus.push('✅ API Token is set');
             } else {
                 configStatus.push('❌ API Token is missing');
             }
-            if (this.organizationId) {
-                configStatus.push('✅ Organization ID is set');
-            } else {
-                configStatus.push('❌ Organization ID is missing');
-            }
 
-            // Test 2: List accessible organizations
-            const organizations = await this.listAccessibleOrganizations();
+            // Test 2: Get user information
+            const user = await this.getCurrentUser();
             configStatus.push('✅ Successfully connected to Eventbrite API');
-            
-            if (organizations.length === 0) {
-                configStatus.push('⚠️ No organizations found for this API token');
-            } else {
-                configStatus.push(`✅ Found ${organizations.length} accessible organization(s)`);
-                
-                // Check if configured org ID is in the list
-                const configuredOrgExists = organizations.some(org => org.id === this.organizationId);
-                if (configuredOrgExists) {
-                    configStatus.push('✅ Configured Organization ID is valid');
-                } else {
-                    configStatus.push('❌ Configured Organization ID not found in accessible organizations');
-                }
-            }
+            configStatus.push('✅ Successfully authenticated with your account');
 
             return {
                 status: configStatus,
-                organizations: organizations.map(org => ({
-                    id: org.id,
-                    name: org.name,
-                    isCurrent: org.id === this.organizationId
-                }))
+                user: {
+                    id: user.id,
+                    email: user.emails[0].email,
+                    name: user.name
+                }
             };
-
         } catch (error) {
             console.error('Connection test failed:', error);
             throw error;

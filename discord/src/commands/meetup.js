@@ -411,24 +411,22 @@ const commands = {
             
             const resultEmbed = new EmbedBuilder()
                 .setTitle('Eventbrite Connection Test Results')
-                .setColor(testResults.organizations.length > 0 ? '#00ff00' : '#ff9900')
+                .setColor('#00ff00')
                 .setDescription(testResults.status.join('\n'))
-                .addFields({
-                    name: 'Configuration',
-                    value: `
-                        • Organization ID: ${process.env.EVENTBRITE_ORGANIZATION_ID}
-                        • API Token: ${process.env.EVENTBRITE_TOKEN ? '****' + process.env.EVENTBRITE_TOKEN.slice(-4) : 'Not set'}
-                    `.trim()
-                });
-
-            if (testResults.organizations.length > 0) {
-                resultEmbed.addFields({
-                    name: 'Available Organizations',
-                    value: testResults.organizations.map(org => 
-                        `${org.isCurrent ? '➡️' : '•'} ${org.name} (ID: ${org.id})`
-                    ).join('\n') + '\n\n*The ➡️ indicates your currently configured organization*'
-                });
-            }
+                .addFields([
+                    {
+                        name: 'Authentication',
+                        value: `Logged in as: ${testResults.user.email}\nUser ID: ${testResults.user.id}`
+                    },
+                    {
+                        name: 'Configuration',
+                        value: `API Token: ${process.env.EVENTBRITE_TOKEN ? '****' + process.env.EVENTBRITE_TOKEN.slice(-4) : 'Not set'}`
+                    },
+                    {
+                        name: 'Next Steps',
+                        value: 'To link an event:\n1. Go to your event on Eventbrite\n2. Copy the event ID from the URL (the number after /e/)\n3. Use `!meetup link <event_id>`'
+                    }
+                ]);
 
             await statusMessage.edit({ embeds: [resultEmbed] });
         } catch (error) {
@@ -446,7 +444,6 @@ const commands = {
                     
                     Please check:
                     • Your Eventbrite API token is valid
-                    • Your Organization ID is correct
                     • You have the necessary permissions
                 `.trim());
             
