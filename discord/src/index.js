@@ -79,10 +79,18 @@ const logMemoryUsage = () => {
   for (let key in used) {
     console.log(`${key}: ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
   }
+  
+  // Check if memory usage is too high (over 450MB for free tier)
+  if (used.heapUsed > 450 * 1024 * 1024) {
+    console.warn('Memory usage is high, initiating garbage collection');
+    if (global.gc) {
+      global.gc();
+    }
+  }
 };
 
-// Log memory usage every 5 minutes
-setInterval(logMemoryUsage, 5 * 60 * 1000);
+// Log memory usage every 15 minutes instead of 5
+setInterval(logMemoryUsage, 15 * 60 * 1000);
 // Initial memory usage log
 logMemoryUsage();
 
@@ -158,11 +166,11 @@ client.once('ready', async () => {
       sslValidate: false, // Disable SSL certificate validation in production
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 3000,
+      socketTimeoutMS: 30000,
+      connectTimeoutMS: 5000,
       retryWrites: true,
-      maxPoolSize: 10,
+      maxPoolSize: 3, // Reduced pool size
       minPoolSize: 0
     };
     
@@ -192,7 +200,7 @@ client.once('ready', async () => {
     await uptimeRobot.updateStatusMessage(client);
     console.log('Status monitoring initialized');
 
-    // Set up automatic status updates every 5 minutes
+    // Set up automatic status updates every 15 minutes instead of 5
     setInterval(async () => {
       try {
         await uptimeRobot.updateStatusMessage(client);
@@ -200,7 +208,7 @@ client.once('ready', async () => {
       } catch (error) {
         console.error('Failed to update status monitoring:', error);
       }
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 15 * 60 * 1000); // 15 minutes
   } catch (error) {
     console.error('Failed to initialize status monitoring:', error);
   }
