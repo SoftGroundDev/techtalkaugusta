@@ -110,19 +110,35 @@ class EventbriteManager {
                 end: event.end?.utc
             });
             
-            // Convert Eventbrite data to meetup format
+            // Convert Eventbrite UTC dates to local time
             const startDate = new Date(event.start.utc);
             const endDate = new Date(event.end.utc);
             
-            // Format the time to show both start and end times
-            const timeStr = `${startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} - ${endDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+            // Format date as YYYY-MM-DD
+            const formattedDate = startDate.toISOString().split('T')[0];
+            
+            // Format time as HH:MM in 12-hour format with AM/PM
+            const formatTimeString = (date) => {
+                return date.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+            };
+            
+            const timeStr = `${formatTimeString(startDate)} - ${formatTimeString(endDate)}`;
+            
+            // Extract venue information safely
+            const location = event.venue 
+                ? `${event.venue.name}${event.venue.address ? `, ${event.venue.address.localized_address_display}` : ''}`
+                : (event.online_event ? 'Online' : 'TBA');
             
             const meetupData = {
                 title: event.name.text,
-                description: event.description.text,
-                date: startDate.toISOString().split('T')[0],
+                description: event.description.text || '',
+                date: formattedDate,
                 time: timeStr,
-                location: event.venue?.name || (event.online_event ? 'Online' : 'TBA'),
+                location: location,
                 topic: event.name.text.split('-')[1]?.trim() || 'Tech Talk Augusta Meetup',
                 speaker: 'TBA',
                 eventbriteId: event.id,
