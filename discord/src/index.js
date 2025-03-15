@@ -6,8 +6,12 @@ const uptimeRobot = require('./modules/uptimerobot');
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const compression = require('compression');
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Enable compression
+app.use(compression());
 
 // Express health check endpoint
 app.get('/health', (req, res) => {
@@ -83,14 +87,36 @@ const logMemoryUsage = () => {
   // Check if memory usage is too high (over 450MB for free tier)
   if (used.heapUsed > 450 * 1024 * 1024) {
     console.warn('Memory usage is high, initiating garbage collection');
-    if (global.gc) {
-      global.gc();
+    try {
+      if (global.gc) {
+        global.gc();
+      }
+    } catch (e) {
+      console.warn('Garbage collection not available. Start with --expose-gc flag if needed.');
+    }
+    
+    // Additional memory optimization for Node.js 20
+    if (process.versions.node.startsWith('20')) {
+      try {
+        // Clear module cache for non-essential modules
+        Object.keys(require.cache).forEach(key => {
+          if (!key.includes('node_modules')) {
+            delete require.cache[key];
+          }
+        });
+      } catch (e) {
+        console.warn('Error clearing module cache:', e);
+      }
     }
   }
 };
 
-// Log memory usage every 15 minutes instead of 5
-setInterval(logMemoryUsage, 15 * 60 * 1000);
+// Optimize intervals based on memory usage
+const MEMORY_CHECK_INTERVAL = process.env.NODE_ENV === 'production' ? 15 * 60 * 1000 : 5 * 60 * 1000;
+const STATUS_UPDATE_INTERVAL = process.env.NODE_ENV === 'production' ? 15 * 60 * 1000 : 5 * 60 * 1000;
+
+// Log memory usage at optimized intervals
+setInterval(logMemoryUsage, MEMORY_CHECK_INTERVAL);
 // Initial memory usage log
 logMemoryUsage();
 
@@ -152,6 +178,45 @@ client.on('messageCreate', async (message) => {
   }
 });
 
+// Connect to database with retry logic
+const connectWithRetry = async (retries = 5, delay = 5000) => {
+  const dbOptions = {
+    ssl: process.env.NODE_ENV === 'production',
+    sslValidate: false,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 3000,
+    socketTimeoutMS: 30000,
+    connectTimeoutMS: 5000,
+    retryWrites: true,
+    maxPoolSize: 3,
+    minPoolSize: 0
+  };
+
+  for (let i = 0; i < retries; i++) {
+    try {
+      console.log(`MongoDB connection attempt ${i + 1} of ${retries}`);
+      await db.connect(dbOptions);
+      console.log('Database connection established successfully');
+      return true;
+    } catch (error) {
+      console.error('Failed to connect to database:', {
+        attempt: i + 1,
+        name: error.name,
+        message: error.message,
+        code: error.code
+      });
+      
+      if (i < retries - 1) {
+        console.log(`Retrying in ${delay/1000} seconds...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  console.log('Failed to connect to MongoDB after all retries. Bot will run without database features.');
+  return false;
+};
+
 // Bot ready event
 client.once('ready', async () => {
   console.log(`Bot is starting up...`);
@@ -159,40 +224,19 @@ client.once('ready', async () => {
   console.log(`Bot ID: ${client.user.id}`);
   console.log(`Connected to ${client.guilds.cache.size} servers`);
   
-  // Connect to database
-  try {
-    const dbOptions = {
-      ssl: process.env.NODE_ENV === 'production',
-      sslValidate: false, // Disable SSL certificate validation in production
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 3000,
-      socketTimeoutMS: 30000,
-      connectTimeoutMS: 5000,
-      retryWrites: true,
-      maxPoolSize: 3, // Reduced pool size
-      minPoolSize: 0
-    };
-    
-    console.log('Attempting to connect to MongoDB with options:', JSON.stringify(dbOptions, null, 2));
-    await db.connect(dbOptions);
-    console.log('Database connection established successfully');
-  } catch (error) {
-    console.error('Failed to connect to database:', {
-      name: error.name,
-      message: error.message,
-      stack: error.stack,
-      code: error.code
-    });
-    // Don't exit the process, allow the bot to run without DB if needed
-  }
-
-  // Initialize meetup schedule
-  try {
-    await client.meetupManager.updateScheduleMessage();
-    console.log('Meetup schedule initialized');
-  } catch (error) {
-    console.error('Failed to initialize meetup schedule:', error);
+  // Try to connect to database
+  const dbConnected = await connectWithRetry();
+  
+  // Initialize features based on database connection
+  if (dbConnected) {
+    try {
+      await client.meetupManager.updateScheduleMessage();
+      console.log('Meetup schedule initialized');
+    } catch (error) {
+      console.error('Failed to initialize meetup schedule:', error);
+    }
+  } else {
+    console.log('Skipping database-dependent features');
   }
 
   // Initialize status monitoring
@@ -200,7 +244,7 @@ client.once('ready', async () => {
     await uptimeRobot.updateStatusMessage(client);
     console.log('Status monitoring initialized');
 
-    // Set up automatic status updates every 15 minutes instead of 5
+    // Set up automatic status updates every 15 minutes
     setInterval(async () => {
       try {
         await uptimeRobot.updateStatusMessage(client);
@@ -208,7 +252,7 @@ client.once('ready', async () => {
       } catch (error) {
         console.error('Failed to update status monitoring:', error);
       }
-    }, 15 * 60 * 1000); // 15 minutes
+    }, STATUS_UPDATE_INTERVAL);
   } catch (error) {
     console.error('Failed to initialize status monitoring:', error);
   }

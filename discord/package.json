@@ -1,25 +1,23 @@
 {
   "name": "tech-talk-augusta-bot",
   "version": "1.0.0",
-  "description": "Discord bot for Tech Talk Augusta meetup group",
+  "description": "Discord bot for Tech Talk Augusta",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
-    "deploy:azure": "az webapp up --name tech-talk-augusta-bot --resource-group tech-talk-augusta --runtime \"NODE:18-lts\" --sku F1"
+    "start": "node --max-old-space-size=512 src/index.js",
+    "dev": "nodemon --max-old-space-size=512 src/index.js"
+  },
+  "engines": {
+    "node": "20.x"
   },
   "dependencies": {
-    "axios": "^1.6.7",
+    "compression": "^1.7.4",
     "discord.js": "^14.14.1",
     "dotenv": "^16.4.5",
-    "express": "^4.21.2",
-    "mongoose": "^8.2.0",
-    "node-cron": "^3.0.3"
+    "express": "^4.18.3",
+    "mongoose": "^8.2.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
   }
 }
