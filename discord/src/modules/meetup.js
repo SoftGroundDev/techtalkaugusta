@@ -65,17 +65,34 @@ class MeetupManager {
             declined: new Set(),
             created: new Date(),
             lastUpdated: new Date(),
-            eventbriteId: null,
-            eventbriteUrl: null,
+            eventbriteId: data.eventbriteId || null,
+            eventbriteUrl: data.eventbriteUrl || null,
             eventbriteSynced: false
         };
 
         try {
-            // Create Eventbrite event first
-            const eventbriteData = await eventbrite.syncWithDiscord(meetup);
-            meetup.eventbriteId = eventbriteData.eventbriteId;
-            meetup.eventbriteUrl = eventbriteData.eventbriteUrl;
-            meetup.eventbriteSynced = true;
+            // If eventbriteId is provided, link to existing event
+            if (data.eventbriteId) {
+                const eventbriteData = await eventbrite.linkExistingEvent(data.eventbriteId);
+                
+                // Parse the date string into a Date object
+                const eventDate = new Date(eventbriteData.date);
+                if (isNaN(eventDate.getTime())) {
+                    throw new Error('Invalid date format from Eventbrite');
+                }
+
+                Object.assign(meetup, {
+                    title: eventbriteData.title,
+                    description: eventbriteData.description,
+                    date: eventDate,
+                    time: eventbriteData.time,
+                    location: eventbriteData.location,
+                    topic: eventbriteData.topic,
+                    eventbriteId: eventbriteData.eventbriteId,
+                    eventbriteUrl: eventbriteData.eventbriteUrl,
+                    eventbriteSynced: true
+                });
+            }
 
             // Save to database
             const Meetup = db.getModel('Meetup');

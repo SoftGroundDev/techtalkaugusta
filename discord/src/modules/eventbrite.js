@@ -2,10 +2,17 @@ const axios = require('axios');
 
 class EventbriteManager {
     constructor() {
+        console.log('Environment variables available:', {
+            EVENTBRITE_TOKEN: process.env.EVENTBRITE_TOKEN ? 'Present' : 'Missing',
+            NODE_ENV: process.env.NODE_ENV,
+            PWD: process.env.PWD
+        });
+
         this.apiToken = process.env.EVENTBRITE_TOKEN;
         this.baseUrl = 'https://www.eventbriteapi.com/v3';
 
         if (!this.apiToken) {
+            console.error('Eventbrite API token is missing. Please check your .env file and environment variables.');
             throw new Error('Eventbrite API token is not configured');
         }
 
@@ -107,18 +114,15 @@ class EventbriteManager {
             const endDate = new Date(event.end.utc);
             
             // Format date as YYYY-MM-DD
-            const formattedDate = startDate.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            }).split('/').reverse().join('-');
+            const formattedDate = startDate.toISOString().split('T')[0];
             
-            // Format time as HH:MM AM/PM
+            // Format time as HH:MM AM/PM - HH:MM AM/PM
             const formatTimeString = (date) => {
                 return date.toLocaleTimeString('en-US', { 
                     hour: 'numeric',
                     minute: '2-digit',
-                    hour12: true
+                    hour12: true,
+                    timeZone: 'America/New_York'
                 });
             };
             
@@ -147,7 +151,7 @@ class EventbriteManager {
             return meetupData;
         } catch (error) {
             console.error('Failed to link Eventbrite event:', error);
-            throw error;
+            throw new Error(`Failed to link Eventbrite event: ${error.message}`);
         }
     }
 
@@ -276,9 +280,9 @@ class EventbriteManager {
             };
         } catch (error) {
             console.error('Failed to sync with Eventbrite:', error);
-            throw new Error(`Failed to create Eventbrite event: ${error.message}`);
+            throw new Error(`Failed to sync with Eventbrite: ${error.message}`);
         }
     }
 }
 
-module.exports = new EventbriteManager(); 
+module.exports = new EventbriteManager();
