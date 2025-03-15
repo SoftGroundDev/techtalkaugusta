@@ -253,6 +253,85 @@ const commands = {
                 • The cancellation has been logged
             `);
         await message.reply({ embeds: [confirmEmbed] });
+    },
+
+    async link(message, args) {
+        // Enhanced permission check
+        if (!hasAdminPermission(message.member)) {
+            const embed = new EmbedBuilder()
+                .setTitle('Permission Denied')
+                .setColor('#ff0000')
+                .setDescription(
+                    '❌ You do not have permission to link meetups.\n\n' +
+                    'Required permissions:\n' +
+                    '• Discord Administrator, OR\n' +
+                    '• One of these roles: Admin, Moderator, Event Organizer'
+                );
+            return message.reply({ embeds: [embed] });
+        }
+
+        const [eventbriteId] = args;
+        if (!eventbriteId) {
+            const embed = new EmbedBuilder()
+                .setTitle('Invalid Command Format')
+                .setColor('#ff9900')
+                .setDescription(
+                    'Please provide an Eventbrite event ID:\n' +
+                    '```\n!meetup link <eventbrite_event_id>\n```\n' +
+                    'You can find the event ID in the Eventbrite URL:\n' +
+                    'https://www.eventbrite.com/e/your-event-name-**event_id**'
+                );
+            return message.reply({ embeds: [embed] });
+        }
+
+        try {
+            // Get event details from Eventbrite
+            const eventbrite = require('../modules/eventbrite');
+            const meetupData = await eventbrite.linkExistingEvent(eventbriteId);
+
+            // Create the meetup
+            const meetup = await message.client.meetupManager.createMeetup({
+                ...meetupData,
+                eventbriteId: eventbriteId,
+                eventbriteUrl: meetupData.eventbriteUrl,
+                eventbriteSynced: true
+            });
+
+            const embed = new EmbedBuilder()
+                .setTitle('Eventbrite Event Linked! 🔗')
+                .setColor('#00ff00')
+                .setDescription(`
+                    Successfully linked Eventbrite event to Discord meetup!
+                    
+                    📋 Details:
+                    • Discord Meetup ID: ${meetup.id}
+                    • Title: ${meetup.title}
+                    • Date: ${meetup.date.toLocaleDateString()}
+                    • Time: ${meetup.time}
+                    • Location: ${meetup.location}
+                    • Topic: ${meetup.topic}
+                    
+                    🎟️ [View on Eventbrite](${meetup.eventbriteUrl})
+                    
+                    Members can RSVP using:
+                    \`!meetup rsvp ${meetup.id} [yes/no/maybe]\`
+                `.trim());
+
+            await message.reply({ embeds: [embed] });
+        } catch (error) {
+            console.error('Failed to link Eventbrite event:', error);
+            const embed = new EmbedBuilder()
+                .setTitle('Error Linking Event')
+                .setColor('#ff0000')
+                .setDescription(
+                    '❌ Failed to link Eventbrite event. Please check the event ID and try again.\n\n' +
+                    'Make sure:\n' +
+                    '• The event ID is correct\n' +
+                    '• The event exists and is accessible\n' +
+                    '• Your Eventbrite API token has the correct permissions'
+                );
+            await message.reply({ embeds: [embed] });
+        }
     }
 };
 

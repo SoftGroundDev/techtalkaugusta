@@ -5,19 +5,50 @@
     
     <!-- Hexagon Pattern (Tech Honeycomb) -->
     <g opacity="0.1">
-        <path d="M150,100 L200,70 L250,100 L250,160 L200,190 L150,160 Z" fill="#FFB800"/>
-        <path d="M250,100 L300,70 L350,100 L350,160 L300,190 L250,160 Z" fill="#FFB800"/>
-        <path d="M200,190 L250,160 L300,190 L300,250 L250,280 L200,250 Z" fill="#FFB800"/>
+        <!-- Top Row -->
+        <path d="M50,40 L100,10 L150,40 L150,100 L100,130 L50,100 Z" fill="#1BBEA1"/>
+        <path d="M150,40 L200,10 L250,40 L250,100 L200,130 L150,100 Z" fill="#F8A942"/>
+        <path d="M250,40 L300,10 L350,40 L350,100 L300,130 L250,100 Z" fill="#EE6C78"/>
+        <path d="M350,40 L400,10 L450,40 L450,100 L400,130 L350,100 Z" fill="#1BBEA1"/>
+        
+        <!-- Second Row -->
+        <path d="M0,130 L50,100 L100,130 L100,190 L50,220 L0,190 Z" fill="#EE6C78"/>
+        <path d="M100,130 L150,100 L200,130 L200,190 L150,220 L100,190 Z" fill="#1BBEA1"/>
+        <path d="M200,130 L250,100 L300,130 L300,190 L250,220 L200,190 Z" fill="#F8A942"/>
+        <path d="M300,130 L350,100 L400,130 L400,190 L350,220 L300,190 Z" fill="#EE6C78"/>
+        <path d="M400,130 L450,100 L500,130 L500,190 L450,220 L400,190 Z" fill="#1BBEA1"/>
+        
+        <!-- Third Row -->
+        <path d="M50,220 L100,190 L150,220 L150,280 L100,310 L50,280 Z" fill="#F8A942"/>
+        <path d="M150,220 L200,190 L250,220 L250,280 L200,310 L150,280 Z" fill="#EE6C78"/>
+        <path d="M250,220 L300,190 L350,220 L350,280 L300,310 L250,280 Z" fill="#1BBEA1"/>
+        <path d="M350,220 L400,190 L450,220 L450,280 L400,310 L350,280 Z" fill="#F8A942"/>
+
+        <!-- Fourth Row -->
+        <path d="M0,310 L50,280 L100,310 L100,370 L50,400 L0,370 Z" fill="#1BBEA1"/>
+        <path d="M100,310 L150,280 L200,310 L200,370 L150,400 L100,370 Z" fill="#F8A942"/>
+        <path d="M200,310 L250,280 L300,310 L300,370 L250,400 L200,370 Z" fill="#EE6C78"/>
+        <path d="M300,310 L350,280 L400,310 L400,370 L350,400 L300,370 Z" fill="#1BBEA1"/>
+        <path d="M400,310 L450,280 L500,310 L500,370 L450,400 L400,370 Z" fill="#F8A942"/>
+
+        <!-- Fifth Row -->
+        <path d="M50,400 L100,370 L150,400 L150,460 L100,490 L50,460 Z" fill="#EE6C78"/>
+        <path d="M150,400 L200,370 L250,400 L250,460 L200,490 L150,460 Z" fill="#1BBEA1"/>
+        <path d="M250,400 L300,370 L350,400 L350,460 L300,490 L250,460 Z" fill="#F8A942"/>
+        <path d="M350,400 L400,370 L450,400 L450,460 L400,490 L350,460 Z" fill="#EE6C78"/>
     </g>
 
     <!-- Bee Body -->
     <g transform="translate(250,250) scale(0.8)">
         <!-- Main Body (Circuit Board Style) -->
         <path d="M-60,-20 
-                 Q-70,0 -60,20 
-                 L60,20 
-                 Q70,0 60,-20 Z" 
-              fill="#FFB800"/>
+                Q-70,0 -60,20 
+                L60,20 
+                Q70,0 60,-20 Z" 
+              fill="#F8A942"
+              stroke="#ffffff"
+              stroke-width="2"
+              stroke-opacity="0.3"/>
         
         <!-- Circuit Lines -->
         <path d="M-40,-10 L40,-10 M-40,0 L40,0 M-40,10 L40,10" 
@@ -25,17 +56,62 @@
               stroke-width="3"
               fill="none"/>
 
-        <!-- Wings (Binary Style) -->
+        <!-- Segments -->
+        <path d="M-40,-20 
+                Q-45,0 -40,20
+                M-20,-20
+                Q-25,0 -20,20
+                M0,-20
+                Q-5,0 0,20
+                M20,-20
+                Q15,0 20,20
+                M40,-20
+                Q35,0 40,20"
+              stroke="#1a1a1a"
+              stroke-width="2"
+              fill="none"/>
+
+        <!-- Circuit Board Details -->
+        <path d="M-50,-10 C-45,-15 -35,-15 -30,-10
+                M-20,-5 C-15,-10 -5,-10 0,-5
+                M10,-12 C15,-17 25,-17 30,-12"
+              stroke="#1a1a1a"
+              stroke-width="1.5"
+              fill="none"/>
+
+        <!-- Enhanced Wings -->
         <path d="M-20,-20 
-                 Q-40,-60 -10,-70
-                 Q20,-60 0,-20"
-              fill="#4FC3F7" 
-              opacity="0.7"/>
+                Q-40,-60 -10,-70
+                Q20,-60 0,-20
+                M-15,-45
+                Q-25,-50 -20,-55
+                M-25,-35
+                Q-35,-40 -30,-45"
+              fill="#1BBEA1" 
+              opacity="0.7"
+              stroke="#ffffff"
+              stroke-width="1.5"
+              stroke-opacity="0.3"/>
         <path d="M20,-20 
-                 Q40,-60 70,-70
-                 Q100,-60 80,-20"
-              fill="#4FC3F7" 
-              opacity="0.7"/>
+                Q40,-60 70,-70
+                Q100,-60 80,-20
+                M25,-45
+                Q35,-50 40,-55
+                M35,-35
+                Q45,-40 50,-45"
+              fill="#1BBEA1" 
+              opacity="0.7"
+              stroke="#ffffff"
+              stroke-width="1.5"
+              stroke-opacity="0.3"/>
+
+        <!-- Wing Details -->
+        <path d="M-15,-40 L-5,-35 M-25,-50 L-15,-45
+                M25,-40 L35,-35 M35,-50 L45,-45"
+              stroke="#1BBEA1"
+              stroke-width="1"
+              opacity="0.5"
+              fill="none"/>
               
         <!-- Binary Pattern on Wings -->
         <text x="-30" y="-40" 
@@ -53,19 +129,34 @@
             0101
         </text>
 
-        <!-- Antenna (Signal Style) -->
+        <!-- Enhanced Antennae -->
         <path d="M-40,-20 
-                 Q-50,-40 -30,-50
-                 M-30,-50 L-25,-45 L-35,-45" 
-              stroke="#FFB800" 
+                Q-50,-40 -30,-50
+                M-30,-50 L-25,-45 L-35,-45
+                M-40,-35 L-35,-40
+                M-45,-30 L-40,-35" 
+              stroke="#F8A942" 
               stroke-width="3"
               fill="none"/>
         <path d="M40,-20 
-                 Q50,-40 30,-50
-                 M30,-50 L25,-45 L35,-45" 
-              stroke="#FFB800" 
+                Q50,-40 30,-50
+                M30,-50 L25,-45 L35,-45
+                M40,-35 L35,-40
+                M45,-30 L40,-35" 
+              stroke="#F8A942" 
               stroke-width="3"
               fill="none"/>
+
+        <!-- Face Background -->
+        <path d="M-35,-15 A35,15 0 0 1 35,-15" 
+              fill="#F8A942" 
+              opacity="0.7"/>
+
+        <!-- Eyes -->
+        <circle cx="-30" cy="-10" r="5" fill="#1a1a1a"/>
+        <circle cx="30" cy="-10" r="5" fill="#1a1a1a"/>
+        <circle cx="-28" cy="-12" r="2" fill="#ffffff" opacity="0.7"/>
+        <circle cx="32" cy="-12" r="2" fill="#ffffff" opacity="0.7"/>
     </g>
 
     <!-- Text -->
@@ -81,7 +172,7 @@
         <text x="0" y="45" 
               font-family="Arial, sans-serif" 
               font-size="35" 
-              fill="#FFB800" 
+              fill="#EE6C78" 
               text-anchor="middle">
             AUGUSTA
         </text>
@@ -89,11 +180,7 @@
 
     <!-- Power Button Circle -->
     <circle cx="250" cy="250" r="240" 
-            stroke="#FFB800" 
+            stroke="#EE6C78" 
             stroke-width="5" 
             fill="none"/>
-    <path d="M250,140 L250,200 M220,170 L280,170" 
-          stroke="#FFB800" 
-          stroke-width="5" 
-          fill="none"/>
 </svg> 

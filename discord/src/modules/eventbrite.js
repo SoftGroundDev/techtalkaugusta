@@ -27,6 +27,31 @@ class EventbriteManager {
         }
     }
 
+    async linkExistingEvent(eventId) {
+        try {
+            const event = await this.getEvent(eventId);
+            
+            // Convert Eventbrite data to meetup format
+            const startDate = new Date(event.start.utc);
+            const meetupData = {
+                title: event.name.html,
+                description: event.description.html,
+                date: startDate.toISOString().split('T')[0],
+                time: startDate.toTimeString().split(' ')[0].substring(0, 5), // HH:MM format
+                location: event.venue_id ? 'TBA' : 'Online', // You might want to fetch venue details
+                topic: event.name.html.split('-')[1]?.trim() || event.name.html,
+                speaker: 'TBA',
+                eventbriteId: event.id,
+                eventbriteUrl: event.url
+            };
+
+            return meetupData;
+        } catch (error) {
+            console.error('Failed to link Eventbrite event:', error);
+            throw error;
+        }
+    }
+
     async createEvent(eventData) {
         try {
             const response = await axios.post(
