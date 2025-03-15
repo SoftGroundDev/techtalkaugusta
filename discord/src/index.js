@@ -6,8 +6,8 @@ const express = require('express');
 const app = express();
 
 // Port configuration for Azure compatibility
-const PORT = process.env.PORT || process.env.WEBSITES_PORT || 8080;
-const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+const PORT = 8080;  // Azure App Service expects port 8080 for container health checks
+const HOST = '0.0.0.0';  // Always use 0.0.0.0 in container environments
 
 // Simple health check endpoint
 app.get('/health', async (req, res) => {
