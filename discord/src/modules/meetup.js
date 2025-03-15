@@ -11,6 +11,15 @@ class MeetupManager {
         this.loadMeetupsFromDB();
     }
 
+    async isDbConnected() {
+        try {
+            return db.isConnected;
+        } catch (error) {
+            console.error('Error checking database connection:', error);
+            return false;
+        }
+    }
+
     async loadMeetupsFromDB() {
         try {
             const Meetup = db.getModel('Meetup');
