@@ -1,4 +1,5 @@
 const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { createHelpEmbed } = require('../utils/helpFormatter');
 
 // Helper function to check admin permissions
 function hasAdminPermission(member) {
@@ -285,9 +286,55 @@ const commands = {
         }
 
         try {
+            // Check if Eventbrite token is configured
+            if (!process.env.EVENTBRITE_TOKEN || !process.env.EVENTBRITE_ORGANIZATION_ID) {
+                const embed = new EmbedBuilder()
+                    .setTitle('Configuration Error')
+                    .setColor('#ff0000')
+                    .setDescription(
+                        '❌ Eventbrite integration is not properly configured.\n\n' +
+                        'Please make sure these environment variables are set:\n' +
+                        '• EVENTBRITE_TOKEN\n' +
+                        '• EVENTBRITE_ORGANIZATION_ID\n\n' +
+                        'Contact the bot administrator for assistance.'
+                    );
+                return message.reply({ embeds: [embed] });
+            }
+
             // Get event details from Eventbrite
-            const eventbrite = require('../modules/eventbrite');
+            let eventbrite;
+            try {
+                eventbrite = require('../modules/eventbrite');
+            } catch (error) {
+                console.error('Failed to load Eventbrite module:', error);
+                const embed = new EmbedBuilder()
+                    .setTitle('Module Error')
+                    .setColor('#ff0000')
+                    .setDescription(
+                        '❌ Failed to load Eventbrite integration module.\n\n' +
+                        'This might be due to:\n' +
+                        '• Missing module files\n' +
+                        '• Configuration issues\n\n' +
+                        'Please contact the bot administrator.'
+                    );
+                return message.reply({ embeds: [embed] });
+            }
+
             const meetupData = await eventbrite.linkExistingEvent(eventbriteId);
+            if (!meetupData) {
+                const embed = new EmbedBuilder()
+                    .setTitle('Event Not Found')
+                    .setColor('#ff0000')
+                    .setDescription(
+                        '❌ Could not find the Eventbrite event.\n\n' +
+                        'Please verify:\n' +
+                        '• The event ID is correct\n' +
+                        '• The event exists and is public\n' +
+                        '• The event belongs to your organization\n\n' +
+                        `Event ID provided: ${eventbriteId}`
+                    );
+                return message.reply({ embeds: [embed] });
+            }
 
             // Create the meetup
             const meetup = await message.client.meetupManager.createMeetup({
@@ -324,11 +371,13 @@ const commands = {
                 .setTitle('Error Linking Event')
                 .setColor('#ff0000')
                 .setDescription(
-                    '❌ Failed to link Eventbrite event. Please check the event ID and try again.\n\n' +
-                    'Make sure:\n' +
-                    '• The event ID is correct\n' +
+                    '❌ Failed to link Eventbrite event.\n\n' +
+                    'Error details:\n' +
+                    `\`\`\`\n${error.message}\n\`\`\`\n\n` +
+                    'Please check:\n' +
+                    '• Your Eventbrite API token is valid\n' +
                     '• The event exists and is accessible\n' +
-                    '• Your Eventbrite API token has the correct permissions'
+                    '• You have permission to access this event'
                 );
             await message.reply({ embeds: [embed] });
         }
