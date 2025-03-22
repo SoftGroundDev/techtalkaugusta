@@ -9,7 +9,7 @@ const path = require('path');
 const express = require('express');
 const db = require('./modules/database');
 const RoleManager = require('./modules/roleManager');
-const app = express();
+const eventsRouter = require('./api/events');
 
 // Port configuration for Azure compatibility
 const port = process.env.port || 8080;  // Azure App Service expects port 8080 for container health checks
@@ -17,6 +17,15 @@ const HOST = '0.0.0.0';  // Always use 0.0.0.0 in container environments
 
 let isDiscordReady = false;
 let isDatabaseReady = false;
+
+const app = express();
+app.use(express.json());
+
+// Store meetup manager in app locals for API access
+app.locals.meetupManager = null;
+
+// Use the events router
+app.use(eventsRouter);
 
 // Express routes - Define before any middleware
 app.get('/health', async (req, res) => {
@@ -99,6 +108,9 @@ async function initializeServices() {
         isDiscordReady = true;
         console.log(`Logged in as ${client.user.tag}`);
         console.log(`Connected to ${client.guilds.cache.size} servers`);
+
+        // After creating the client and meetup manager
+        app.locals.meetupManager = client.meetupManager;
       } catch (error) {
         console.error('Error during bot initialization:', error);
       }
@@ -170,4 +182,10 @@ async function initializeServices() {
 initializeServices().catch(error => {
   console.error('Failed to start services:', error);
   process.exit(1);
+});
+
+// Start the API server
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`API server running on port ${PORT}`);
 }); 

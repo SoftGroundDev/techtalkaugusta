@@ -1,3 +1,10 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+# Sitemap
+Sitemap: https://techtalkaugusta.com/sitemap.xml
+
+# Disallow admin and form submissions
+Disallow: /admin/
+Disallow: /forms/
