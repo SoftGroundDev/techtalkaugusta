@@ -440,16 +440,28 @@ MIT License - See LICENSE file for details
    - Create a new application
    - Add a bot to your application
    - Copy the bot token to your `.env` file
-   - Enable necessary intents (Presence, Server Members, Message Content)
+   - Enable necessary intents:
+     - Server Members Intent
+     - Message Content Intent
+     - Guild Messages Intent
+     - Reactions Intent
 
 4. **Invite the Bot**
-   - Generate an invite link from the OAuth2 section
-   - Required permissions:
+   - Go to OAuth2 → URL Generator
+   - Select scopes:
+     - `bot`
+     - `applications.commands`
+   - Select bot permissions:
+     - Manage Roles
+     - Manage Channels
+     - Manage Messages
      - Send Messages
      - Read Messages/View Channels
-     - Manage Roles
-     - Manage Messages
      - Add Reactions
+     - Use External Emojis
+     - Read Message History
+     - Mention Everyone
+   - Use the generated URL to invite the bot
 
 5. **Run the Bot**
    ```bash

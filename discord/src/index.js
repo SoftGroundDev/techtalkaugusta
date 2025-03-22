@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const db = require('./modules/database');
+const RoleManager = require('./modules/roleManager');
 const app = express();
 
 // Port configuration for Azure compatibility
@@ -71,10 +72,12 @@ async function initializeServices() {
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMessageReactions,
       ],
     });
 
     client.commands = new Collection();
+    client.roleManager = new RoleManager(client);
 
     // Load commands
     const commandFiles = fs.readdirSync(path.join(__dirname, 'commands'))

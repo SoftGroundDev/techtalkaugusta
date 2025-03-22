@@ -8,6 +8,14 @@
 <svelte:head>
 	<title>Tech Talk Augusta</title>
 	<meta name="description" content="Tech Talk Augusta, " />
+	<meta name="description" content="Join our monthly tech meetup in Augusta, Georgia. Connect with local tech enthusiasts, share ideas, and learn about the latest trends in technology.">
+	<meta name="keywords" content="Tech Meetup, Augusta Georgia, Technology Community, Networking, Monthly Events">
+	<meta name="author" content="Tech Talk Augusta"> 
+	<meta property="og:title" content="Augusta Tech Meetup">
+	<meta property="og:description" content="Join our monthly tech meetup in Augusta, Georgia. Connect with local tech enthusiasts and learn about the latest trends in technology.">
+	<meta property="og:url" content="https://techtalkaugusta.com">
+	<meta name="twitter:title" content="Augusta Tech Meetup">
+	<meta name="twitter:description" content="Join our monthly tech meetup in Augusta, Georgia. Connect with local tech enthusiasts and learn about the latest trends in technology.">
 </svelte:head>
 
 <section class="mb-10">
