@@ -367,10 +367,6 @@
 		border-radius: var(--radius-lg);
 	}
 
-	.member-count {
-		margin-top: var(--spacing-4);
-	}
-
 	@media (max-width: 768px) {
 		.feature-card {
 			grid-template-columns: 1fr;
@@ -396,9 +392,16 @@
 			padding-right: 0;
 		}
 
-		.member-count iframe {
-			width: 100%;
-			height: 400px;
+		.container {
+			padding: 1rem;
+		}
+
+		h2 {
+			font-size: 1.6rem;
+		}
+
+		h3 {
+			font-size: 1.2rem;
 		}
 	}
 
