@@ -1,0 +1,1 @@
+export const transparentLogo = '/images/transparent-logo.png'; 
