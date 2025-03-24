@@ -6,33 +6,14 @@
 	const events = [
 		{
 			id: 1,
-			title: 'Web Development Workshop',
-			date: '2024-04-15',
+			title: 'April 1st Third Tech Talk Augusta Meetup',
+			date: '2024-04-01',
 			time: '6:00 PM',
 			location: 'Augusta Tech Hub',
-			description: 'Join us for a hands-on workshop on modern web development techniques.',
-			type: 'workshop',
-			image: stockEvent
-		},
-		{
-			id: 2,
-			title: 'AI & Machine Learning Meetup',
-			date: '2024-04-22',
-			time: '7:00 PM',
-			location: 'Virtual Event',
-			description: 'Discussion on the latest developments in AI and machine learning.',
+			description: 'Join us for our third Tech Talk Augusta meetup! Connect with local tech enthusiasts, share ideas, and learn about the latest trends in technology.',
 			type: 'meetup',
-			image: stockEvent
-		},
-		{
-			id: 3,
-			title: 'Cybersecurity Panel',
-			date: '2024-05-01',
-			time: '6:30 PM',
-			location: 'Augusta University',
-			description: 'Expert panel discussion on current cybersecurity challenges and solutions.',
-			type: 'panel',
-			image: stockEvent
+			image: stockEvent,
+			registrationUrl: 'https://www.eventbrite.com/e/april-1st-third-tech-talk-augusta-meetup-tickets-1285325586429'
 		}
 	];
 
@@ -111,7 +92,11 @@
 						<h3>{event.title}</h3>
 						<p class="location">{event.location}</p>
 						<p class="description">{event.description}</p>
-						<a href="/forms/event-registration" class="btn btn-primary">Register</a>
+						{#if event.registrationUrl}
+							<a href={event.registrationUrl} class="btn btn-primary" target="_blank" rel="noopener noreferrer">Register on Eventbrite</a>
+						{:else}
+							<a href="/forms/event-registration" class="btn btn-primary">Register</a>
+						{/if}
 					</div>
 				</div>
 			{/each}

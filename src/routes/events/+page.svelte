@@ -19,16 +19,21 @@
 
 	onMount(async () => {
 		try {
-			const response = await fetch('/api/discord/events');
-			if (!response.ok) {
-				throw new Error('Failed to fetch events');
-			}
-			const data = await response.json();
-			events = data.events;
+			// For now, we'll use static data since the API is not ready
+			events = [{
+				id: '1',
+				title: 'April 1st Third Tech Talk Augusta Meetup',
+				date: '2024-04-01',
+				time: '7:00 PM',
+				location: 'Savannah River Brewing Company',
+				description: 'Join us for our third Tech Talk Augusta meetup! Connect with local tech enthusiasts, share ideas, and learn about the latest trends in technology.',
+				registrationUrl: 'https://www.eventbrite.com/e/april-1st-third-tech-talk-augusta-meetup-tickets-1285325586429',
+				createdAt: new Date().toISOString()
+			}];
+			loading = false;
 		} catch (e) {
 			error = 'Failed to load events. Please try again later.';
 			console.error('Error loading events:', e);
-		} finally {
 			loading = false;
 		}
 	});
