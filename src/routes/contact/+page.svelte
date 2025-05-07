@@ -4,10 +4,19 @@
 
 <svelte:head>
 	<title>Contact - Tech Talk Augusta</title>
-	<meta name="description" content="Get in touch with Tech Talk Augusta. We'd love to hear from you about events, partnerships, or any questions you may have." />
-	<meta name="keywords" content="Contact Us, Tech Talk Augusta, Get in Touch, Augusta Tech Community" />
+	<meta
+		name="description"
+		content="Get in touch with Tech Talk Augusta. We'd love to hear from you about events, partnerships, or any questions you may have."
+	/>
+	<meta
+		name="keywords"
+		content="Contact Us, Tech Talk Augusta, Get in Touch, Augusta Tech Community"
+	/>
 	<meta property="og:title" content="Contact - Tech Talk Augusta" />
-	<meta property="og:description" content="Get in touch with Tech Talk Augusta. We'd love to hear from you about events, partnerships, or any questions you may have." />
+	<meta
+		property="og:description"
+		content="Get in touch with Tech Talk Augusta. We'd love to hear from you about events, partnerships, or any questions you may have."
+	/>
 	<meta property="og:image" content="https://techtalkaugusta.com/images/og-image.jpg" />
 	<meta property="og:url" content="https://techtalkaugusta.com/contact" />
 </svelte:head>
@@ -18,7 +27,8 @@
 			<img src={transparentLogo} alt="Tech Talk Augusta Logo" class="hero-logo" />
 			<h1>Get in Touch</h1>
 			<p class="lead">
-				Have questions about our events, want to partner with us, or just want to say hello? We'd love to hear from you!
+				Have questions about our events, want to partner with us, or just want to say hello? We'd
+				love to hear from you!
 			</p>
 		</div>
 	</div>
@@ -32,8 +42,15 @@
 				<div class="contact-methods">
 					<div class="contact-method">
 						<h3>Discord Community</h3>
-						<p>Join our Discord server to connect with other members of the Augusta tech community.</p>
-						<a href="https://discord.gg/techtalkaugusta" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+						<p>
+							Join our Discord server to connect with other members of the Augusta tech community.
+						</p>
+						<a
+							href="https://discord.gg/Wju9NncCwA"
+							class="btn btn-primary"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
 							Join Discord
 						</a>
 					</div>
@@ -41,15 +58,27 @@
 						<h3>Social Media</h3>
 						<p>Follow us on social media for updates and community highlights.</p>
 						<div class="social-links">
-							<a href="https://twitter.com/techtalkaugusta" target="_blank" rel="noopener noreferrer">Twitter</a>
-							<a href="https://linkedin.com/company/techtalkaugusta" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-							<a href="https://github.com/techtalkaugusta" target="_blank" rel="noopener noreferrer">GitHub</a>
+							<a
+								href="https://twitter.com/techtalkaugusta"
+								target="_blank"
+								rel="noopener noreferrer">Twitter</a
+							>
+							<a
+								href="https://linkedin.com/company/techtalkaugusta"
+								target="_blank"
+								rel="noopener noreferrer">LinkedIn</a
+							>
+							<a href="https://github.com/techtalkaugusta" target="_blank" rel="noopener noreferrer"
+								>GitHub</a
+							>
 						</div>
 					</div>
 					<div class="contact-method">
 						<h3>Email</h3>
 						<p>For direct inquiries, you can reach us at:</p>
-						<a href="mailto:hello@techtalkaugusta.com" class="email-link">hello@techtalkaugusta.com</a>
+						<a href="mailto:hello@techtalkaugusta.com" class="email-link"
+							>hello@techtalkaugusta.com</a
+						>
 					</div>
 				</div>
 			</div>
@@ -191,4 +220,4 @@
 			gap: var(--spacing-2);
 		}
 	}
-</style> 
+</style>

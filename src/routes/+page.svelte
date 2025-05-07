@@ -7,16 +7,28 @@
 
 <svelte:head>
 	<title>Tech Talk Augusta</title>
-	<meta name="description" content="Join our monthly tech meetup in Augusta, Georgia. Connect with local tech enthusiasts, share ideas, and learn about the latest trends in technology." />
-	<meta name="keywords" content="Tech Meetup, Augusta Georgia, Technology Community, Networking, Monthly Events" />
+	<meta
+		name="description"
+		content="Join our monthly tech meetup in Augusta, Georgia. Connect with local tech enthusiasts, share ideas, and learn about the latest trends in technology."
+	/>
+	<meta
+		name="keywords"
+		content="Tech Meetup, Augusta Georgia, Technology Community, Networking, Monthly Events"
+	/>
 	<meta name="author" content="Tech Talk Augusta" />
 	<meta property="og:title" content="Augusta Tech Meetup" />
-	<meta property="og:description" content="Join our monthly tech meetup in Augusta, Georgia. Connect with local tech enthusiasts and learn about the latest trends in technology." />
+	<meta
+		property="og:description"
+		content="Join our monthly tech meetup in Augusta, Georgia. Connect with local tech enthusiasts and learn about the latest trends in technology."
+	/>
 	<meta property="og:image" content="https://techtalkaugusta.com/images/og-image.jpg" />
 	<meta property="og:url" content="https://techtalkaugusta.com" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Augusta Tech Meetup" />
-	<meta name="twitter:description" content="Join our monthly tech meetup in Augusta, Georgia. Connect with local tech enthusiasts and learn about the latest trends in technology." />
+	<meta
+		name="twitter:description"
+		content="Join our monthly tech meetup in Augusta, Georgia. Connect with local tech enthusiasts and learn about the latest trends in technology."
+	/>
 	<meta name="twitter:image" content="https://techtalkaugusta.com/images/twitter-image.jpg" />
 </svelte:head>
 
@@ -80,9 +92,7 @@
 
 			<div class="cta-card">
 				<h3>Get in Touch</h3>
-				<p>
-					Have questions or suggestions? We'd love to hear from you!
-				</p>
+				<p>Have questions or suggestions? We'd love to hear from you!</p>
 				<a href="/forms/contact" class="btn btn-secondary">Contact Us</a>
 			</div>
 		</div>
@@ -100,10 +110,11 @@
 		<div class="about-grid">
 			<div class="about-content">
 				<p>
-					As the home of the Army Cyber Center of Excellence, the Augusta National, Georgia Cyber Center, and
-					the Savannah River Nuclear Site, our city is no stranger to world-class projects and cutting-edge
-					expertise. Yet, while these institutions bring incredible resources and talent, there's a missing
-					piece: support for small businesses, local software developers, and the vibrant downtown community.
+					As the home of the Army Cyber Center of Excellence, the Augusta National, Georgia Cyber
+					Center, and the Savannah River Nuclear Site, our city is no stranger to world-class
+					projects and cutting-edge expertise. Yet, while these institutions bring incredible
+					resources and talent, there's a missing piece: support for small businesses, local
+					software developers, and the vibrant downtown community.
 				</p>
 
 				<h3>Our Vision</h3>
@@ -113,23 +124,24 @@
 						downtown.
 					</li>
 					<li>
-						<strong>Community Investment:</strong> Tech professionals supporting the arts, education, and local
-						equity initiatives.
+						<strong>Community Investment:</strong> Tech professionals supporting the arts, education,
+						and local equity initiatives.
 					</li>
 					<li>
-						<strong>Educational Growth:</strong> Integrating tech curricula into schools to empower the next
-						generation of innovators.
+						<strong>Educational Growth:</strong> Integrating tech curricula into schools to empower the
+						next generation of innovators.
 					</li>
 					<li>
-						<strong>Inclusivity and Opportunity:</strong> Using technology to reduce poverty and increase equality
-						across our city.
+						<strong>Inclusivity and Opportunity:</strong> Using technology to reduce poverty and increase
+						equality across our city.
 					</li>
 				</ul>
 
 				<p>
-					Augusta has the talent, the drive, and the resources to stand on its own two feet as a tech leader—not
-					just for government contractors but for everyone who calls this city home. Together, we can build
-					a community where technology uplifts every corner of Augusta. Join us in making it happen.
+					Augusta has the talent, the drive, and the resources to stand on its own two feet as a
+					tech leader—not just for government contractors but for everyone who calls this city home.
+					Together, we can build a community where technology uplifts every corner of Augusta. Join
+					us in making it happen.
 				</p>
 			</div>
 		</div>
@@ -152,7 +164,12 @@
 					<li>Role-based channels and access</li>
 				</ul>
 				<div class="discord-cta">
-					<a href="https://discord.gg/techtalkaugusta" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+					<a
+						href="https://discord.gg/Wju9NncCwA"
+						class="btn btn-primary"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
 						Join Discord Server
 					</a>
 				</div>
@@ -176,8 +193,8 @@
 				<div class="card-icon">🎯</div>
 				<h3>Monthly Tech Talks</h3>
 				<p>
-					Join us every month for engaging presentations on cutting-edge technology topics,
-					from AI to cybersecurity.
+					Join us every month for engaging presentations on cutting-edge technology topics, from AI
+					to cybersecurity.
 				</p>
 				<a href="/calendar" class="btn btn-secondary">View Schedule</a>
 			</div>
@@ -186,8 +203,8 @@
 				<div class="card-icon">💻</div>
 				<h3>Code & Coffee</h3>
 				<p>
-					Weekly casual meetups where developers can work on projects together,
-					share knowledge, and network.
+					Weekly casual meetups where developers can work on projects together, share knowledge, and
+					network.
 				</p>
 				<button class="btn btn-secondary" disabled>Coming Soon</button>
 			</div>
@@ -196,8 +213,8 @@
 				<div class="card-icon">🤝</div>
 				<h3>Tech Career Fair</h3>
 				<p>
-					Connect with local tech companies and discover career opportunities
-					in Augusta's growing tech sector.
+					Connect with local tech companies and discover career opportunities in Augusta's growing
+					tech sector.
 				</p>
 				<button class="btn btn-secondary" disabled>Coming Soon</button>
 			</div>
@@ -206,8 +223,7 @@
 				<div class="card-icon">🎓</div>
 				<h3>Student Mentorship</h3>
 				<p>
-					Bridging the gap between education and industry through mentorship
-					programs and workshops.
+					Bridging the gap between education and industry through mentorship programs and workshops.
 				</p>
 				<button class="btn btn-secondary" disabled>Coming Soon</button>
 			</div>
@@ -316,7 +332,7 @@
 	}
 
 	.feature-list li::before {
-		content: "•";
+		content: '•';
 		color: var(--color-primary);
 		position: absolute;
 		left: 0;
@@ -351,7 +367,7 @@
 	}
 
 	.discord-features li::before {
-		content: "•";
+		content: '•';
 		color: var(--color-primary);
 		position: absolute;
 		left: 0;
