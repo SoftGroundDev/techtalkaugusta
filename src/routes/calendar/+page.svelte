@@ -13,7 +13,7 @@
 			description: 'Join us for our third Tech Talk Augusta meetup! Connect with local tech enthusiasts, share ideas, and learn about the latest trends in technology.',
 			type: 'meetup',
 			image: stockEvent,
-			registrationUrl: 'https://www.eventbrite.com/e/april-1st-third-tech-talk-augusta-meetup-tickets-1285325586429'
+			registrationUrl: 'https://www.eventbrite.com/o/softground-103977616831'
 		}
 	];
 
@@ -41,72 +41,37 @@
 			<p class="lead">
 				Join us for exciting tech talks, workshops, and networking events in Augusta.
 			</p>
+			<div class="hero-cta">
+				<a href="https://www.eventbrite.com/o/softground-103977616831" class="btn btn-primary btn-large" target="_blank" rel="noopener noreferrer">
+					View All Events on Eventbrite
+				</a>
+			</div>
 		</div>
 	</div>
 </section>
 
 <section class="calendar">
 	<div class="container">
-		<div class="filters">
-			<button 
-				class="filter-btn {selectedType === 'all' ? 'active' : ''}" 
-				on:click={() => selectedType = 'all'}
-			>
-				All Events
-			</button>
-			<button 
-				class="filter-btn {selectedType === 'meetup' ? 'active' : ''}" 
-				on:click={() => selectedType = 'meetup'}
-			>
-				Meetups
-			</button>
-			<button 
-				class="filter-btn {selectedType === 'workshop' ? 'active' : ''}" 
-				on:click={() => selectedType = 'workshop'}
-			>
-				Workshops
-			</button>
-			<button 
-				class="filter-btn {selectedType === 'panel' ? 'active' : ''}" 
-				on:click={() => selectedType = 'panel'}
-			>
-				Panels
-			</button>
-		</div>
-
-		<div class="events-grid">
-			{#each filteredEvents as event}
-				<div class="event-card">
-					<div class="event-image">
-						<img src={event.image} alt={event.title} />
-					</div>
-					<div class="event-content">
-						<div class="event-date">
-							<span class="date">{new Date(event.date).toLocaleDateString('en-US', { 
-								month: 'long', 
-								day: 'numeric', 
-								year: 'numeric' 
-							})}</span>
-							<span class="time">{event.time}</span>
-						</div>
-						<h3>{event.title}</h3>
-						<p class="location">{event.location}</p>
-						<p class="description">{event.description}</p>
-						{#if event.registrationUrl}
-							<a href={event.registrationUrl} class="btn btn-primary" target="_blank" rel="noopener noreferrer">Register on Eventbrite</a>
-						{:else}
-							<a href="/forms/event-registration" class="btn btn-primary">Register</a>
-						{/if}
-					</div>
+		<div class="event-types">
+			<h2>Event Types</h2>
+			<div class="event-types-grid">
+				<div class="event-type-card">
+					<div class="card-icon">🎯</div>
+					<h3>Tech Talks</h3>
+					<p>Monthly presentations on cutting-edge technology topics</p>
 				</div>
-			{/each}
-		</div>
-
-		{#if filteredEvents.length === 0}
-			<div class="no-events">
-				<p>No events found for the selected category.</p>
+				<div class="event-type-card">
+					<div class="card-icon">💻</div>
+					<h3>Workshops</h3>
+					<p>Hands-on learning sessions for practical skills</p>
+				</div>
+				<div class="event-type-card">
+					<div class="card-icon">🤝</div>
+					<h3>Networking</h3>
+					<p>Connect with local tech professionals</p>
+				</div>
 			</div>
-		{/if}
+		</div>
 	</div>
 </section>
 
@@ -238,6 +203,53 @@
 		color: var(--color-text-light);
 	}
 
+	.hero-cta {
+		margin-top: var(--spacing-8);
+	}
+
+	.btn-large {
+		font-size: var(--font-size-lg);
+		padding: var(--spacing-4) var(--spacing-8);
+	}
+
+	.event-types {
+		padding: var(--spacing-16) 0;
+	}
+
+	.event-types-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: var(--spacing-8);
+		margin-top: var(--spacing-8);
+	}
+
+	.event-type-card {
+		background: white;
+		padding: var(--spacing-6);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-md);
+		text-align: center;
+		transition: transform 0.2s ease;
+	}
+
+	.event-type-card:hover {
+		transform: translateY(-4px);
+	}
+
+	.card-icon {
+		font-size: 2.5rem;
+		margin-bottom: var(--spacing-4);
+	}
+
+	.event-type-card h3 {
+		color: var(--color-text);
+		margin-bottom: var(--spacing-4);
+	}
+
+	.event-type-card p {
+		color: var(--color-text-light);
+	}
+
 	@media (max-width: 768px) {
 		.event-card {
 			grid-template-columns: 1fr;
@@ -262,6 +274,10 @@
 
 		.filter-btn {
 			width: 100%;
+		}
+
+		.event-types-grid {
+			grid-template-columns: 1fr;
 		}
 	}
 </style>

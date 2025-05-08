@@ -34,67 +34,21 @@
 
 <section class="hero">
 	<div class="container">
-		<div class="hero-content">
-			<img src={transparentLogo} alt="Tech Talk Augusta Logo" class="hero-logo" />
-			<h1>Tech Talk Augusta</h1>
-			<h2>Building a Thriving Tech Community in Augusta</h2>
-			<p class="hero-text">
-				Join us in fostering innovation, connection, and equity in Augusta's tech scene.
-			</p>
-		</div>
-	</div>
-</section>
-
-<section class="features">
-	<div class="container">
-		<div class="feature-grid">
-			<div class="feature-card">
-				<img src={stockCommunity} alt="Community members sharing a meal" class="feature-image" />
-				<div class="feature-content">
-					<h3>Community Calendar</h3>
-					<p>Stay updated with all tech events in Augusta.</p>
-					<a href="/events" class="btn btn-primary">View Events</a>
-				</div>
-			</div>
-
-			<div class="feature-card">
-				<div class="feature-content">
-					<h3>Event Archive</h3>
-					<p>Access previous talks, events, and presentations.</p>
-					<a href="https://dev.to/techtalkaugusta" class="btn btn-primary">View Past Events</a>
-				</div>
-				<img src={stockBlog} alt="Person working on computer" class="feature-image" />
-			</div>
-
-			<div class="feature-card">
-				<img src={stockFriends} alt="Group of friends" class="feature-image" />
-				<div class="feature-content">
-					<h3>Tech Directory</h3>
-					<p>Connect with local tech professionals and companies.</p>
-					<button class="btn btn-primary" disabled>Coming Soon</button>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
-
-<section class="cta-section">
-	<div class="container">
-		<div class="cta-grid">
-			<div class="cta-card">
-				<h3>Call For Speakers</h3>
-				<p>
-					Share your expertise and inspire others in our community. We're always looking for
-					passionate speakers to share their knowledge and experiences.
-				</p>
-				<a href="/forms/call-for-speakers" class="btn btn-secondary">Apply to Speak</a>
-			</div>
-
-			<div class="cta-card">
-				<h3>Get in Touch</h3>
-				<p>Have questions or suggestions? We'd love to hear from you!</p>
-				<a href="/forms/contact" class="btn btn-secondary">Contact Us</a>
-			</div>
+		<h1>Welcome to Tech Talk Augusta</h1>
+		<h2 class="subheading">We're more than a monthly meetup</h2>
+		<p class="lead">
+			Building a thriving tech community in Augusta, Georgia through innovation, connection, and
+			equity.
+		</p>
+		<div class="hero-cta">
+			<a
+				href="https://www.eventbrite.com/o/softground-103977616831"
+				class="btn btn-primary"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				View Upcoming Events
+			</a>
 		</div>
 	</div>
 </section>
@@ -196,7 +150,7 @@
 					Join us every month for engaging presentations on cutting-edge technology topics, from AI
 					to cybersecurity.
 				</p>
-				<a href="/calendar" class="btn btn-secondary">View Schedule</a>
+				<a href="https://www.eventbrite.com/o/softground-103977616831" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">View Schedule on Eventbrite</a>
 			</div>
 
 			<div class="whats-next-card">
@@ -253,6 +207,15 @@
 		font-size: var(--font-size-xl);
 		color: var(--color-text-light);
 		margin-top: var(--spacing-4);
+	}
+
+	.hero-cta {
+		margin-top: var(--spacing-8);
+	}
+
+	.btn-large {
+		font-size: var(--font-size-lg);
+		padding: var(--spacing-4) var(--spacing-8);
 	}
 
 	.features {
@@ -465,5 +428,21 @@
 		.whats-next-grid {
 			grid-template-columns: 1fr;
 		}
+	}
+
+	.feature-card.highlight {
+		border: 2px solid var(--color-primary);
+		transform: scale(1.02);
+	}
+
+	.feature-card.highlight .feature-content {
+		background: var(--color-surface);
+	}
+
+	.subheading {
+		font-size: var(--font-size-xl);
+		color: var(--color-text-light);
+		margin: var(--spacing-4) 0;
+		font-weight: normal;
 	}
 </style>

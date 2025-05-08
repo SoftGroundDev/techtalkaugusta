@@ -43,9 +43,6 @@
 					<a href="/about" class:active={$page.url.pathname === '/about'} on:click={closeMenu}>About</a>
 				</li>
 				<li>
-					<a href="/events" class:active={$page.url.pathname === '/events'} on:click={closeMenu}>Events</a>
-				</li>
-				<li>
 					<a href="/blog" class:active={$page.url.pathname === '/blog'} on:click={closeMenu}>Blog</a>
 				</li>
 				<li>
