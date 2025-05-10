@@ -65,7 +65,7 @@
 						</svg>
 					</a>
 					<a
-						href="https://github.com/techtalkaugusta"
+						href="https://github.com/SoftGroundDev/techtalkaugusta"
 						target="_blank"
 						rel="noopener noreferrer"
 						aria-label="Follow us on GitHub"

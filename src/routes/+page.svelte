@@ -154,33 +154,15 @@
 			</div>
 
 			<div class="whats-next-card">
-				<div class="card-icon">💻</div>
-				<h3>Code & Coffee</h3>
+				<div class="card-icon">🎤</div>
+				<h3>Call for Speakers</h3>
 				<p>
-					Weekly casual meetups where developers can work on projects together, share knowledge, and
-					network.
+					Share your expertise and inspire others in our community. We're always looking for passionate
+					speakers.
 				</p>
-				<button class="btn btn-secondary" disabled>Coming Soon</button>
+				<a href="/forms/call-for-speakers" class="btn btn-secondary">Apply to Speak</a>
 			</div>
 
-			<div class="whats-next-card">
-				<div class="card-icon">🤝</div>
-				<h3>Tech Career Fair</h3>
-				<p>
-					Connect with local tech companies and discover career opportunities in Augusta's growing
-					tech sector.
-				</p>
-				<button class="btn btn-secondary" disabled>Coming Soon</button>
-			</div>
-
-			<div class="whats-next-card">
-				<div class="card-icon">🎓</div>
-				<h3>Student Mentorship</h3>
-				<p>
-					Bridging the gap between education and industry through mentorship programs and workshops.
-				</p>
-				<button class="btn btn-secondary" disabled>Coming Soon</button>
-			</div>
 		</div>
 	</div>
 </section>
