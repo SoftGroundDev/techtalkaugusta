@@ -17,7 +17,7 @@
 	}
 
 	let resources: Resource[] = [];
-	let loading = true;
+	/* let loading = true; */
 	let error: string | null = null;
 	let selectedCategory = 'all';
 	let searchQuery = '';
@@ -139,7 +139,7 @@
 				</div>
 			</div>
 		</div>
-
+		<!--
 		{#if loading}
 			<div class="loading">
 				<p>Loading resources...</p>
@@ -181,6 +181,7 @@
 				</div>
 			</div>
 		{/if}
+		-->
 	</div>
 </section>
 
