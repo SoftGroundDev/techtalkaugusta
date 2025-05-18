@@ -1,5 +1,44 @@
 <script lang="ts">
 	import { transparentLogo } from '$lib/images';
+	import { onMount } from 'svelte';
+
+	interface BlogPost {
+		id: number;
+		title: string;
+		description: string;
+		cover_image: string;
+		url: string;
+		published_at: string;
+		reading_time_minutes: number;
+		tag_list: string[];
+	}
+
+	let posts: BlogPost[] = [];
+	let loading = true;
+	let error: string | null = null;
+
+	onMount(async () => {
+		try {
+			const response = await fetch('/api/blog');
+			if (!response.ok) {
+				throw new Error('Failed to fetch blog posts');
+			}
+			posts = await response.json();
+		} catch (e) {
+			error = 'Failed to load blog posts. Please try again later.';
+			console.error('Error loading blog posts:', e);
+		} finally {
+			loading = false;
+		}
+	});
+
+	function formatDate(dateString: string) {
+		return new Date(dateString).toLocaleDateString('en-US', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric'
+		});
+	}
 </script>
 
 <svelte:head>
@@ -23,33 +62,53 @@
 <section class="hero">
 	<div class="container">
 		<div class="hero-content">
-			<img src={transparentLogo} alt="Tech Talk Augusta Logo" class="hero-logo" />
 			<h1>Tech Talk Blog</h1>
 			<p class="lead">Stay updated with the latest tech news, tutorials, and community stories.</p>
 		</div>
 	</div>
 </section>
 
-<section class="coming-soon">
+<section class="blog-posts">
 	<div class="container">
-		<div class="content">
-			<h2>Coming Soon!</h2>
-			<p>
-				We're working on bringing you insightful articles, tutorials, and stories from our tech
-				community. In the meantime, join us on Discord to participate in discussions and stay
-				updated.
-			</p>
-			<div class="cta">
-				<a
-					href="https://discord.gg/Wju9NncCwA"
-					class="btn btn-primary"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Join Our Discord
-				</a>
+		{#if loading}
+			<div class="loading">Loading posts...</div>
+		{:else if error}
+			<div class="error">{error}</div>
+		{:else if posts.length === 0}
+			<div class="no-posts">
+				<h2>No Posts Yet</h2>
+				<p>Check back soon for new content!</p>
 			</div>
-		</div>
+		{:else}
+			<div class="posts-grid">
+				{#each posts as post}
+					<article class="post-card">
+						{#if post.cover_image}
+							<a href={post.url} target="_blank" rel="noopener noreferrer" class="post-image">
+								<img src={post.cover_image} alt={post.title} />
+							</a>
+						{/if}
+						<div class="post-content">
+							<h2>
+								<a href={post.url} target="_blank" rel="noopener noreferrer">{post.title}</a>
+							</h2>
+							<p class="post-description">{post.description}</p>
+							<div class="post-meta">
+								<span class="post-date">{formatDate(post.published_at)}</span>
+								<span class="post-reading-time">{post.reading_time_minutes} min read</span>
+							</div>
+							{#if post.tag_list.length > 0}
+								<div class="post-tags">
+									{#each post.tag_list as tag}
+										<span class="tag">{tag}</span>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					</article>
+				{/each}
+			</div>
+		{/if}
 	</div>
 </section>
 
@@ -77,30 +136,110 @@
 		margin-top: var(--spacing-4);
 	}
 
-	.coming-soon {
+	.blog-posts {
 		padding: var(--spacing-16) 0;
 	}
 
-	.content {
-		max-width: 600px;
+	.container {
+		max-width: 1200px;
 		margin: 0 auto;
-		text-align: center;
+		padding: 0 var(--spacing-4);
 	}
 
-	.content h2 {
-		font-size: var(--font-size-3xl);
+	.posts-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: var(--spacing-8);
+		margin-top: var(--spacing-8);
+	}
+
+	.post-card {
+		background: var(--color-surface);
+		border-radius: var(--border-radius-lg);
+		overflow: hidden;
+		transition: transform 0.2s ease-in-out;
+		box-shadow: var(--shadow-md);
+	}
+
+	.post-card:hover {
+		transform: translateY(-4px);
+		box-shadow: var(--shadow-lg);
+	}
+
+	.post-image {
+		display: block;
+		width: 100%;
+		height: 200px;
+		overflow: hidden;
+	}
+
+	.post-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.post-content {
+		padding: var(--spacing-6);
+	}
+
+	.post-content h2 {
+		font-size: var(--font-size-xl);
+		margin-bottom: var(--spacing-4);
+		line-height: 1.3;
+	}
+
+	.post-content h2 a {
 		color: var(--color-text);
+		text-decoration: none;
+	}
+
+	.post-content h2 a:hover {
+		color: var(--color-primary);
+	}
+
+	.post-description {
+		color: var(--color-text-light);
+		font-size: var(--font-size-base);
+		margin-bottom: var(--spacing-4);
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.post-meta {
+		display: flex;
+		justify-content: space-between;
+		color: var(--color-text-light);
+		font-size: var(--font-size-sm);
 		margin-bottom: var(--spacing-4);
 	}
 
-	.content p {
-		font-size: var(--font-size-lg);
-		color: var(--color-text-light);
-		margin-bottom: var(--spacing-8);
+	.post-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-2);
 	}
 
-	.cta {
-		margin-top: var(--spacing-8);
+	.tag {
+		background: var(--color-primary-light);
+		color: var(--color-primary);
+		padding: var(--spacing-1) var(--spacing-2);
+		border-radius: var(--border-radius-full);
+		font-size: var(--font-size-sm);
+	}
+
+	.loading,
+	.error,
+	.no-posts {
+		text-align: center;
+		padding: var(--spacing-16);
+		color: var(--color-text-light);
+	}
+
+	.error {
+		color: var(--color-error);
 	}
 
 	@media (max-width: 768px) {
@@ -116,12 +255,12 @@
 			font-size: var(--font-size-lg);
 		}
 
-		.content h2 {
-			font-size: var(--font-size-2xl);
+		.posts-grid {
+			grid-template-columns: 1fr;
 		}
 
-		.content p {
-			font-size: var(--font-size-base);
+		.post-image {
+			height: 180px;
 		}
 	}
 </style>
