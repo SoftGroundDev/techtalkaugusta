@@ -49,6 +49,9 @@
 					<a href="/resources" class:active={$page.url.pathname === '/resources'} on:click={closeMenu}>Resources</a>
 				</li>
 				<li>
+					<a href="/forms" class:active={$page.url.pathname.startsWith('/forms')} on:click={closeMenu}>Forms</a>
+				</li>
+				<li>
 					<a href="/contact" class:active={$page.url.pathname === '/contact'} on:click={closeMenu}>Contact</a>
 				</li>
 			</ul>

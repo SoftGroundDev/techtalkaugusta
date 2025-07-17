@@ -99,42 +99,40 @@
 		</div>
 
 		<div class="resources-grid">
-			<div class="resource-card">
-				<img src={stockLearning} alt="Learning Platforms" />
-				<div class="resource-content">
-					<h3>Learning Platforms</h3>
-					<ul>
-						<li><a href="https://www.coursera.org" target="_blank" rel="noopener noreferrer">Coursera</a></li>
-						<li><a href="https://www.udemy.com" target="_blank" rel="noopener noreferrer">Udemy</a></li>
-						<li><a href="https://www.freecodecamp.org" target="_blank" rel="noopener noreferrer">freeCodeCamp</a></li>
-						<li><a href="https://www.pluralsight.com" target="_blank" rel="noopener noreferrer">Pluralsight</a></li>
-						<li><a href="https://www.linkedin.com/learning" target="_blank" rel="noopener noreferrer">LinkedIn Learning</a></li>
-					</ul>
-				</div>
-			</div>
-
-			<div class="resource-card">
-				<img src={stockTools} alt="Development Tools" />
-				<div class="resource-content">
-					<h3>Development Tools</h3>
-					<ul>
-						<li><a href="https://code.visualstudio.com" target="_blank" rel="noopener noreferrer">Visual Studio Code</a></li>
-						<li><a href="https://www.git-scm.com" target="_blank" rel="noopener noreferrer">Git</a></li>
-						<li><a href="https://www.docker.com" target="_blank" rel="noopener noreferrer">Docker</a></li>
-						<li><a href="https://www.postman.com" target="_blank" rel="noopener noreferrer">Postman</a></li>
-					</ul>
-				</div>
-			</div>
 
 			<div class="resource-card">
 				<img src={stockCommunity} alt="Community Resources" />
 				<div class="resource-content">
 					<h3>Community Resources</h3>
 					<ul>
-						<li><a href="https://dev.to" target="_blank" rel="noopener noreferrer">Dev.to</a></li>
-						<li><a href="https://stackoverflow.com" target="_blank" rel="noopener noreferrer">Stack Overflow</a></li>
-						<li><a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-						<li><a href="https://discord.com" target="_blank" rel="noopener noreferrer">Discord</a></li>
+						<li><a href="https://dev.to/techtalkaugusta" target="_blank" rel="noopener noreferrer">Dev.to</a></li>
+						<li><a href="https://github.com/SoftGroundDev/techtalkaugusta" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+						<li><a href="https://discord.gg/2y7D3d7g3x" target="_blank" rel="noopener noreferrer">Discord</a></li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="resource-card">
+				<img src={stockCommunity} alt="Talent Roster" />
+				<div class="resource-content">
+					<h3>Local Opportunities</h3>
+					<ul>
+						<li class="resource-list-item">
+							<a href="https://forms.gle/e4ZK5AwG4dQmTtQ56" target="_blank" rel="noopener noreferrer">
+								Join the Talent Roster
+							</a>
+							<p class="resource-description">
+								Share your skills and availability for freelance and contract work in Augusta.
+							</p>
+						</li>
+						<li class="resource-list-item">
+							<a href="https://forms.gle/FiiuirrJn1YPTFLm6" target="_blank" rel="noopener noreferrer">
+								Submit a Project
+							</a>
+							<p class="resource-description">
+								Looking for help with a tech, design, or marketing project? Connect with skilled local professionals from our community.
+							</p>
+						</li>
 					</ul>
 				</div>
 			</div>
@@ -376,6 +374,30 @@
 
 	.no-resources {
 		color: var(--color-text-light);
+	}
+
+	.resource-list-item {
+		display: flex;
+		flex-direction: column;
+		gap: var(--spacing-2);
+		margin-bottom: var(--spacing-4);
+	}
+
+	.resource-list-item .resource-description {
+		font-size: var(--font-size-sm);
+		color: var(--color-text-light);
+		margin: 0;
+		padding-left: var(--spacing-2);
+	}
+
+	.resource-list-item a {
+		color: var(--color-primary);
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	.resource-list-item a:hover {
+		text-decoration: underline;
 	}
 
 	@media (max-width: 768px) {
