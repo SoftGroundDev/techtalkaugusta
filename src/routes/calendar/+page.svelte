@@ -82,7 +82,7 @@
 			<p>
 				Subscribe to our newsletter to receive updates about upcoming events and community news.
 			</p>
-			<a href="/forms/newsletter" class="btn btn-secondary">Subscribe to Newsletter</a>
+			<a href="https://techtalkaugusta.beehiiv.com/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Subscribe to Newsletter</a>
 		</div>
 	</div>
 </section>

@@ -163,6 +163,15 @@
 				<a href="/forms/call-for-speakers" class="btn btn-secondary">Apply to Speak</a>
 			</div>
 
+			<div class="whats-next-card">
+				<div class="card-icon">📧</div>
+				<h3>Stay Connected</h3>
+				<p>
+					Get the latest updates about Tech Talk Augusta delivered straight to your inbox. Don't miss out on upcoming events and community news.
+				</p>
+				<a href="https://techtalkaugusta.beehiiv.com/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Subscribe to Newsletter</a>
+			</div>
+
 		</div>
 	</div>
 </section>

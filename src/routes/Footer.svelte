@@ -22,6 +22,7 @@
 					<li><a href="/blog">Blog</a></li>
 					<li><a href="/resources">Resources</a></li>
 					<li><a href="/forms/contact">Contact</a></li>
+					<li><a href="https://techtalkaugusta.beehiiv.com/" target="_blank" rel="noopener noreferrer">Newsletter</a></li>
 				</ul>
 			</div>
 
