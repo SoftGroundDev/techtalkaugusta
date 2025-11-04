@@ -10,7 +10,8 @@
 			date: '2024-04-01',
 			time: '6:00 PM',
 			location: 'Augusta Tech Hub',
-			description: 'Join us for our third Tech Talk Augusta meetup! Connect with local tech enthusiasts, share ideas, and learn about the latest trends in technology.',
+			description:
+				'Join us for our third Tech Talk Augusta meetup! Connect with local tech enthusiasts, share ideas, and learn about the latest trends in technology.',
 			type: 'meetup',
 			image: stockEvent,
 			registrationUrl: 'https://www.eventbrite.com/o/softground-103977616831'
@@ -18,17 +19,25 @@
 	];
 
 	let selectedType = 'all';
-	$: filteredEvents = selectedType === 'all' 
-		? events 
-		: events.filter(event => event.type === selectedType);
+	$: filteredEvents =
+		selectedType === 'all' ? events : events.filter((event) => event.type === selectedType);
 </script>
 
 <svelte:head>
 	<title>Calendar - Tech Talk Augusta</title>
-	<meta name="description" content="View upcoming tech events, workshops, and meetups in Augusta, Georgia. Join our community for knowledge sharing and networking." />
-	<meta name="keywords" content="Augusta Tech Events, Tech Meetups, Workshops, Calendar, Georgia Tech Community" />
+	<meta
+		name="description"
+		content="View upcoming tech events, workshops, and meetups in Augusta, Georgia. Join our community for knowledge sharing and networking."
+	/>
+	<meta
+		name="keywords"
+		content="Augusta Tech Events, Tech Meetups, Workshops, Calendar, Georgia Tech Community"
+	/>
 	<meta property="og:title" content="Calendar - Tech Talk Augusta" />
-	<meta property="og:description" content="View upcoming tech events, workshops, and meetups in Augusta, Georgia. Join our community for knowledge sharing and networking." />
+	<meta
+		property="og:description"
+		content="View upcoming tech events, workshops, and meetups in Augusta, Georgia. Join our community for knowledge sharing and networking."
+	/>
 	<meta property="og:image" content="https://techtalkaugusta.com/images/og-image.jpg" />
 	<meta property="og:url" content="https://techtalkaugusta.com/calendar" />
 </svelte:head>
@@ -42,7 +51,12 @@
 				Join us for exciting tech talks, workshops, and networking events in Augusta.
 			</p>
 			<div class="hero-cta">
-				<a href="https://www.eventbrite.com/o/softground-103977616831" class="btn btn-primary btn-large" target="_blank" rel="noopener noreferrer">
+				<a
+					href="https://www.eventbrite.com/o/softground-103977616831"
+					class="btn btn-primary btn-large"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					View All Events on Eventbrite
 				</a>
 			</div>
@@ -82,7 +96,12 @@
 			<p>
 				Subscribe to our newsletter to receive updates about upcoming events and community news.
 			</p>
-			<a href="https://techtalkaugusta.beehiiv.com/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Subscribe to Newsletter</a>
+			<a
+				href="https://techtalkaugusta.beehiiv.com/"
+				class="btn btn-secondary"
+				target="_blank"
+				rel="noopener noreferrer">Subscribe to Newsletter</a
+			>
 		</div>
 	</div>
 </section>

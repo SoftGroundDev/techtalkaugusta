@@ -150,15 +150,20 @@
 					Join us every month for engaging presentations on cutting-edge technology topics, from AI
 					to cybersecurity.
 				</p>
-				<a href="https://www.eventbrite.com/o/softground-103977616831" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">View Schedule on Eventbrite</a>
+				<a
+					href="https://www.eventbrite.com/o/softground-103977616831"
+					class="btn btn-secondary"
+					target="_blank"
+					rel="noopener noreferrer">View Schedule on Eventbrite</a
+				>
 			</div>
 
 			<div class="whats-next-card">
 				<div class="card-icon">🎤</div>
 				<h3>Call for Speakers</h3>
 				<p>
-					Share your expertise and inspire others in our community. We're always looking for passionate
-					speakers.
+					Share your expertise and inspire others in our community. We're always looking for
+					passionate speakers.
 				</p>
 				<a href="/forms/call-for-speakers" class="btn btn-secondary">Apply to Speak</a>
 			</div>
@@ -167,11 +172,16 @@
 				<div class="card-icon">📧</div>
 				<h3>Stay Connected</h3>
 				<p>
-					Get the latest updates about Tech Talk Augusta delivered straight to your inbox. Don't miss out on upcoming events and community news.
+					Get the latest updates about Tech Talk Augusta delivered straight to your inbox. Don't
+					miss out on upcoming events and community news.
 				</p>
-				<a href="https://techtalkaugusta.beehiiv.com/" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">Subscribe to Newsletter</a>
+				<a
+					href="https://techtalkaugusta.beehiiv.com/"
+					class="btn btn-secondary"
+					target="_blank"
+					rel="noopener noreferrer">Subscribe to Newsletter</a
+				>
 			</div>
-
 		</div>
 	</div>
 </section>
