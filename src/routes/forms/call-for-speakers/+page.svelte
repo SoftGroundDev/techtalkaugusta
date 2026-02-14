@@ -17,10 +17,9 @@
 			Share your expertise and inspire others in our community. We're always looking for passionate
 			speakers to share their knowledge and experiences.
 		</p>
-
 		<div class="form-container">
 			<iframe
-				src="https://wax-warbler-fff.notion.site/ebd/194bc6eec566802e8557f2ce3ca6ac2f"
+				src="https://wax-warbler-fff.notion.site/194bc6eec566802e8557f2ce3ca6ac2f"
 				width="100%"
 				height="600"
 				frameborder="0"
