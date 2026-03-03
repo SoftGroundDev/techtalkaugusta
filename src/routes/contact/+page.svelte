@@ -76,8 +76,8 @@
 					<div class="contact-method">
 						<h3>Email</h3>
 						<p>For direct inquiries, you can reach us at:</p>
-						<a href="mailto:hello@techtalkaugusta.com" class="email-link"
-							>hello@techtalkaugusta.com</a
+						<a href="mailto:hi@techtalkaugusta.com" class="email-link"
+							>hi@techtalkaugusta.com</a
 						>
 					</div>
 				</div>

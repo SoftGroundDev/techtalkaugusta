@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { transparentLogo } from '$lib/images';
+    import transparentLogo from '$lib/images/logo-transparent.png';
 </script>
 
 <svelte:head>
@@ -15,7 +15,7 @@
     <div class="hero-content">
         <img src={transparentLogo} alt="Tech Talk Augusta Logo" class="logo" />
         <h1>Privacy Policy</h1>
-        <p class="lead">Last updated: {new Date().toLocaleDateString()}</p>
+        <p class="lead">Last updated: March 3, 2026</p>
     </div>
 </div>
 
@@ -65,17 +65,24 @@
 
         <section>
             <h2>4. Data Storage and Security</h2>
-            <p>We use MongoDB to store your data securely. We implement appropriate security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction.</p>
+            <p>Your data is stored securely using industry-standard third-party services:</p>
+            <ul>
+                <li><strong>HubSpot:</strong> Email addresses and contact information from event registrations</li>
+                <li><strong>Notion:</strong> Speaker applications and related submissions</li>
+                <li><strong>Eventbrite:</strong> Event registration and ticketing data</li>
+            </ul>
+            <p>We implement appropriate security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction.</p>
         </section>
 
         <section>
             <h2>5. Third-Party Services</h2>
             <p>We use the following third-party services:</p>
             <ul>
-                <li>Discord API</li>
-                <li>Meetup.com API</li>
-                <li>Eventbrite API</li>
-                <li>Facebook Graph API</li>
+                <li>Discord (community platform)</li>
+                <li>Eventbrite (event registration and ticketing)</li>
+                <li>HubSpot (email marketing and CRM)</li>
+                <li>Notion (form submissions and content management)</li>
+                <li>Stripe (payment processing)</li>
             </ul>
         </section>
 
@@ -95,8 +102,8 @@
             <h2>7. Contact Us</h2>
             <p>If you have any questions about this Privacy Policy, please contact us at:</p>
             <ul>
-                <li>Email: [Your Contact Email]</li>
-                <li>Discord: [Your Discord Username]</li>
+                <li>Email: <a href="mailto:hi@techtalkaugusta.com">hi@techtalkaugusta.com</a></li>
+                <li>Discord: <a href="https://discord.gg/Wju9NncCwA" target="_blank" rel="noopener noreferrer">Join our Discord server</a></li>
             </ul>
         </section>
     </div>
@@ -171,6 +178,15 @@
         line-height: 1.6;
         color: #4a4a4a;
         margin-bottom: 0.5rem;
+    }
+
+    a {
+        color: var(--color-primary);
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
     }
 
     @media (max-width: 768px) {

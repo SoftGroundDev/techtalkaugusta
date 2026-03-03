@@ -30,6 +30,14 @@
 				</ul>
 			</div>
 
+			<div class="footer-legal">
+				<h3>Legal</h3>
+				<ul>
+					<li><a href="/terms">Terms of Service</a></li>
+					<li><a href="/privacy">Privacy Policy</a></li>
+				</ul>
+			</div>
+
 			<div class="footer-social">
 				<h3>Connect With Us</h3>
 				<div class="social-links">
@@ -138,7 +146,7 @@
 
 	.footer-grid {
 		display: grid;
-		grid-template-columns: 2fr 1fr 1fr;
+		grid-template-columns: 2fr 1fr 1fr 1fr;
 		gap: var(--spacing-8);
 		margin-bottom: var(--spacing-8);
 	}
@@ -159,28 +167,33 @@
 	}
 
 	.footer-links h3,
+	.footer-legal h3,
 	.footer-social h3 {
 		font-size: var(--font-size-lg);
 		margin-bottom: var(--spacing-4);
 	}
 
-	.footer-links ul {
+	.footer-links ul,
+	.footer-legal ul {
 		list-style: none;
 		padding: 0;
 		margin: 0;
 	}
 
-	.footer-links li {
+	.footer-links li,
+	.footer-legal li {
 		margin-bottom: var(--spacing-2);
 	}
 
-	.footer-links a {
+	.footer-links a,
+	.footer-legal a {
 		color: var(--color-text-light);
 		text-decoration: none;
 		transition: color var(--transition-fast);
 	}
 
-	.footer-links a:hover {
+	.footer-links a:hover,
+	.footer-legal a:hover {
 		color: var(--color-primary);
 	}
 
