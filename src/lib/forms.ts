@@ -23,6 +23,22 @@ export const googleForms: GoogleForm[] = [
 		googleFormUrl: 'https://forms.gle/sZcLuEMpvvD962TS7',
 		category: 'projects',
 		active: true
+	},
+	{
+		id: 'call-for-speakers',
+		title: 'Call for Speakers',
+		description: 'Share your expertise with Augusta\'s tech community. Apply to speak at our monthly tech talks and workshops.',
+		googleFormUrl: 'https://wax-warbler-fff.notion.site/ebd//194bc6eec566802e8557f2ce3ca6ac2f',
+		category: 'speakers',
+		active: true
+	},
+	{
+		id: 'speaker-info',
+		title: 'Speaker Information Form',
+		description: 'Complete your speaker profile. Share your bio, headshot, and technical requirements.',
+		googleFormUrl: 'https://wax-warbler-fff.notion.site/ebd//2ddbc6eec56680298cd2f4e1fe568df0',
+		category: 'speakers',
+		active: true
 	}
 ];
 
